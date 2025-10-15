@@ -5,7 +5,7 @@ project(myUtils)
 # Set default install prefix if not provided by the user
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     # Set install prefix next to the build directory
-    get_filename_component(_default_prefix "${CMAKE_BINARY_DIR}/../install_myUtils" ABSOLUTE)
+    get_filename_component(_default_prefix "${CMAKE_BINARY_DIR}/../install" ABSOLUTE)
     set(CMAKE_INSTALL_PREFIX "${_default_prefix}" CACHE PATH "Install path prefix" FORCE)
 endif()
 
