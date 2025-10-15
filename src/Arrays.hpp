@@ -4,6 +4,7 @@
 #include <string>
 #include <math.h>
 #include <numbers>
+#include <cstddef>
 
 namespace Utils::Arrays {
 

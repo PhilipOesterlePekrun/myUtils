@@ -22,6 +22,12 @@ inline double step(double x) {
 // returns angle in degrees, >= 0 and < 360
 double atan2(double y, double x);
 
+inline double inv(double d) {
+  if(d==0.0)
+    return 0.0;
+  return 1.0/d;
+}
+
 }
 
 }
