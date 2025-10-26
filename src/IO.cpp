@@ -9,7 +9,7 @@
 #include <limits>
 #include <numbers>
 
-namespace Utils::IO {
+namespace MyUtils::IO {
 
 namespace fs = std::filesystem;
 
@@ -156,15 +156,15 @@ void replaceKeywordsAndWriteFile(std::string& filePathInAbs, std::string& folder
   std::string filePathOutFull = folderOutAbs+fileNameOut;
 
   std::vector<std::string> stringArr(maxLines);
-  int linesOut=Utils::IO::readFileLines(filePathInAbs, &stringArr, maxLines);
+  int linesOut=MyUtils::IO::readFileLines(filePathInAbs, &stringArr, maxLines);
   if(!onlyCopy) for(int i = 0; i < lengthKwArr; i++) {
     if(replacements[i]=="-") std::cerr<<"replacements["<<i<<"]==\"-\"\n";
-    Utils::Strings::replaceKeyword(&stringArr, "-=-["+keywords[i]+"]-=-", replacements[i], linesOut);
+    MyUtils::Strings::replaceKeyword(&stringArr, "-=-["+keywords[i]+"]-=-", replacements[i], linesOut);
   }
 
   std::filesystem::path filePathOutPath(filePathOutFull);
   std::filesystem::create_directory(filePathOutPath.parent_path());
-  Utils::IO::writeFileLinesBinary(filePathOutFull, &stringArr);
+  MyUtils::IO::writeFileLinesBinary(filePathOutFull, &stringArr);
 }
   
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include "Core.hpp"
 
 #include <iostream>
 #include <string>
@@ -6,7 +7,7 @@
 #include <numbers>
 #include <cstddef>
 
-namespace Utils::Arrays {
+namespace MyUtils::Arrays {
 
 template <typename T, std::size_t N>
 std::size_t getArrLengthStatic(T (&array)[N]) {

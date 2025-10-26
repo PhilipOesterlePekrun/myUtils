@@ -1,11 +1,12 @@
 #pragma once
+#include "Core.hpp"
 
 #include <string>
 #include <vector>
 
 #include "Strings.hpp"
 
-namespace Utils::IO {
+namespace MyUtils::IO {
   
 std::string findFileWithString(const std::string& dir, const std::string& substring);
 

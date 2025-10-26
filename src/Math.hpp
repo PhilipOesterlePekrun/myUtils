@@ -1,4 +1,5 @@
 #pragma once
+#include "Core.hpp"
 
 #include <iostream>
 #include <math.h>
@@ -6,7 +7,7 @@
 
 #include "Constants.hpp"
 
-namespace Utils::Math {
+namespace MyUtils::Math {
 
 namespace CommonFunctions {
 

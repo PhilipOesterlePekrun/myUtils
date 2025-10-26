@@ -1,10 +1,6 @@
 #include "Timer.hpp"
 
-#include <MyFem_Array_def.hpp>
-
-#include <algorithm>
-
-namespace Utils::Timer {
+namespace MyUtils::Timer {
   
 #if(TIMERS_ON)
   

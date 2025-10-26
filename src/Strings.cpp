@@ -4,7 +4,7 @@
 
 #include "Arrays.hpp"
 
-namespace Utils::Strings {
+namespace MyUtils::Strings {
 
 int* checkForIn(const std::string& checkFor, const std::string& checkIn, int returnArrayLength) {
   int* returnArray =(int*)malloc(returnArrayLength*sizeof(int));

@@ -1,4 +1,5 @@
 #pragma once
+#include "Core.hpp"
 
 #include <iostream>
 #include <string>
@@ -6,7 +7,7 @@
 #include <limits>
 #include <numbers>
 
-namespace Utils::CompMech {
+namespace MyUtils::CompMech {
 
 struct fieldExtrema {
   double max = std::numeric_limits<double>::min(); // default access modifier is public for structs btw
