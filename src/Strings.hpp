@@ -63,7 +63,9 @@ inline std::string levelizeString(const std::string& s, int level) {
   return tmpS;
 }
 
-inline Array<std::string> strToStrArray(const std::string& s) {
+inline MyArray::Array<std::string> strToStrArray(const std::string& s) {
+  using MyArray::Array;
+  
   auto out = Array<std::string>();
   if(s == "") return out;
   out.push_back("");
@@ -76,14 +78,16 @@ inline Array<std::string> strToStrArray(const std::string& s) {
   }
   return out;
 }
-inline std::string strArrayToStr(const Array<std::string>& a) {
+inline std::string strArrayToStr(const MyArray::Array<std::string>& a) {
   std::string out = "";
   FOR(i, a.size())
     out += a(i) + "\n";
   return out;
 }
 
-inline Array<int> checkForIn(const std::string& checkFor, const std::string& checkIn) { // TODOi: you have to move Array into myUtils so that you can also move this back into myUtils
+inline MyArray::Array<int> checkForIn(const std::string& checkFor, const std::string& checkIn) { // TODOi: remove the other checkForIn
+  using MyArray::Array;
+  
   auto out = Array<int>();
   std::string checkInTemp = checkIn;
   if (checkFor.length() <= checkIn.length()) {
@@ -102,6 +106,8 @@ inline Array<int> checkForIn(const std::string& checkFor, const std::string& che
 
 // aligns the string rows at certain keys, like e.g. "|"" will be vertically aligned according to count (TODOm: make an overload for Array<std::string> where each ele is a row)
 inline std::string alignStringAt(const std::string& s, const std::string& alignerKey) {
+  using MyArray::Array;
+  
   auto a = strToStrArray(s);
   const int aSize = a.size();
   auto maxSpacing = Array<int>();

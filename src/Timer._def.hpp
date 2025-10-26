@@ -1,10 +1,13 @@
-#include "Timer.hpp"
+#pragma once
+#include "Timer_decl.hpp"
+
+#include "Strings.hpp"
 
 namespace MyUtils::Timer {
   
-#if(TIMERS_ON)
+#if(defined(myUtils_ENABLE_TIMERS) && myUtils_ENABLE_TIMERS)
   
-void TimerRegistry::addTimer(const Timer& timer) {
+inline void TimerRegistry::addTimer(const Timer& timer) {
   std::lock_guard<std::mutex> lock(mutex_);
   std::string name = timer.name_;
   auto it = timers_.find(name);
@@ -17,7 +20,7 @@ void TimerRegistry::addTimer(const Timer& timer) {
   }
 }
 
-std::string TimerRegistry::timingReportStr(bool sortByStartElseFinish) {
+inline std::string TimerRegistry::timingReportStr(bool sortByStartElseFinish) {
   std::string out = "==== Timing Report ====\n";
   double totalTime = std::chrono::duration<double>(std::chrono::high_resolution_clock::now()-totalStart_).count();
   std::string out2 = "Timer name | Timer value [s] | Share of registry total [%] | Start of timer [s]\n";
@@ -43,12 +46,12 @@ std::string TimerRegistry::timingReportStr(bool sortByStartElseFinish) {
 
 #else
 
-std::string TimerRegistry::timingReportStr() const noexcept {
+inline std::string TimerRegistry::timingReportStr() const noexcept {
   std::string out = "==== Timing Report : Timers are off (TIMERS_ON == false) ====\n";
   out += "Registry name: "+registryName_+"\n";
   double totalTime = std::chrono::duration<double>(std::chrono::high_resolution_clock::now()-totalStart_).count();
   out += "Total registry time | " + std::to_string(totalTime) + "s\n";
-  return levelizeString(out, 1);
+  return Strings::levelizeString(out, 1);
 }
 
 #endif
