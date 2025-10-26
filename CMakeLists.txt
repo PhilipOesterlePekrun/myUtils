@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 project(myUtils)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Set default install prefix if not provided by the user
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
