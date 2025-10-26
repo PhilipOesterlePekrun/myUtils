@@ -21,7 +21,6 @@ include(GNUInstallDirs)
 # Sources (optional for now)
 file(GLOB_RECURSE myUtils_SOURCES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/test/*.cpp"
 )
 
 # Add the library
@@ -33,11 +32,6 @@ target_include_directories(myUtils PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-
-# Create executable for testing/demo
-add_executable(myUtils_Test test/Test_Main.cpp)
-target_link_libraries(myUtils_Test PRIVATE myUtils)
-
 # Install library target
 install(TARGETS myUtils
     EXPORT myUtilsTargets
@@ -45,7 +39,6 @@ install(TARGETS myUtils
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
-
 
 # Install all .hpp files from src/ EXCEPT myUtils.hpp into include/myUtils/
 install(DIRECTORY src/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/myUtils
@@ -55,15 +48,24 @@ install(DIRECTORY src/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/myUtils
 # Install myUtils.hpp to include/ directly
 install(FILES src/myUtils.hpp DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-
-# Only if installing with tests (not necessary usually)
-#install(DIRECTORY test/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/myUtils/test
-#        FILES_MATCHING PATTERN "*.hpp")
-
-
 # Export target info for downstream usage
 install(EXPORT myUtilsTargets
     FILE myUtilsTargets.cmake
     NAMESPACE myUtils::
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/myUtils
 )
+
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/myUtilsConfig.cmake"
+"
+include(\"\${CMAKE_CURRENT_LIST_DIR}/myUtilsTargets.cmake\")
+")
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/myUtilsConfig.cmake"
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/myUtils
+)
+
+# Create test executable
+add_executable(test
+  test/Test_Main.cpp
+  test/Test1.cpp
+  )
+target_link_libraries(test myUtils)
