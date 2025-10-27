@@ -6,10 +6,12 @@
 #include <mutex>
 #include <unordered_map>
 
-namespace MyUtils::Timer {
+#include "MyArray.hpp"
+
+namespace MyUtils::Timers {
 
 class Timer; // fwd decl
-
+////#define myUtils_ENABLE_TIMERS true //# tmp
 #if(defined(myUtils_ENABLE_TIMERS) && myUtils_ENABLE_TIMERS)
   
 class TimerRegistry {
@@ -18,7 +20,7 @@ class TimerRegistry {
   : registryName_(registryName) {};
  public:
   static TimerRegistry& globalInstance() {
-    static TimerRegistry registry = TimerRegistry("Global Instance");
+    static TimerRegistry registry = TimerRegistry("Static Registry Instance");
     return registry;
   }
   
@@ -30,7 +32,7 @@ class TimerRegistry {
   // Usually called by the Timers themselves (automatically for ScopedTimer)
   void addTimer(const Timer& timer);
 
-  std::string timingReportStr(bool sortedByFinishElseStart = false);
+  std::string timingReportStr(int levelizeN = 0, bool sortedByFinishElseStart = false);
 
  private:
   std::string registryName_;
@@ -38,7 +40,7 @@ class TimerRegistry {
   //Array<Timer> timers_;
   std::chrono::high_resolution_clock::time_point totalStart_;
   std::unordered_map<std::string, Timer> timers_;
-  Array<std::string> timersOrdered_;
+  MyArray::Array<std::string> timersOrdered_;
 };
 
 class Timer { // TODOm: probably should all virtual destructor for memory stuff? so the destruction gets upcast? idk how it works honestly
@@ -47,7 +49,7 @@ class Timer { // TODOm: probably should all virtual destructor for memory stuff?
   Timer(const std::string& name)
   : name_(name) {}
   double getTimerVal_secDouble() const {
-    if(active_) warn("Timer \""+name_+"\" is still active!");
+    if(active_) ;//#warn("Timer \""+name_+"\" is still active!");
     return timerVal_secDouble_;
   }
  public:
@@ -153,4 +155,4 @@ class StandardTimer {
 
 #endif
 
-} // namespace MyFem
+} // namespace MyUtils::Timers

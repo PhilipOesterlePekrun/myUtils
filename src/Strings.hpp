@@ -37,7 +37,6 @@ std::string trimZerosAfterDecimalPoint(std::string& str);
 void replaceKeyword(std::vector<std::string>* stringArr, const std::string& kwText, const std::string& replace, int linesOut = strAndIO_maxLinesDefault, int maxPerLine = 20);
 
 
-
 // // STRING UTILITIES INTENDED FOR EVENTUAL OUTPUT (TODOi: put these in myUtils eventually, but probably need to put Array and such in myUtils as well, which I should do anyways)
 inline std::string repeatStr(const std::string& s, int count) {
   if(count <= 0)
