@@ -11,6 +11,9 @@ namespace MyUtils::IO {
 std::string findFileWithString(const std::string& dir, const std::string& substring);
 
 int countFilesInFolder(const std::string& dirPath, const bool recursive);
+
+std::string readFileFromStr(const std::string& filePath);
+void writeFileFromStr(const std::string& filePath, const std::string& str, bool chmodX = false);
   
 int readFileLines(const std::string& filePath, std::vector<std::string>* strVect, int maxLines);
 
@@ -22,5 +25,15 @@ void writeFileLinesBinary(const std::string& filePath, std::vector<std::string>*
 std::string stringVect2DToCSV(std::vector<std::vector<std::string>> strVect, int xCount, int yCount);
 
 void replaceKeywordsAndWriteFile(std::string& filePathInAbs, std::string& folderOutAbs, std::string& fileNameOut, std::string* keywords, std::string* replacements, int lengthKwArr, bool onlyCopy = false, int maxLines = strAndIO_maxLinesDefault);
+
+}
+
+// With MyArray
+#include "MyArray.hpp"
+namespace MyUtils::IO {
+  
+MyArray::Array<std::string> readFileLines(const std::string& filePath);
+
+void writeFileLines(const std::string& filePath, MyArray::Array<std::string> lines, bool chmodX = false);
 
 }

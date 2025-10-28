@@ -65,6 +65,22 @@ int countFilesInFolder(const std::string& dirPath, const bool recursive) {
   return fileCount;
 }
 
+std::string readFileFromStr(const std::string& filePath) {
+  std::ifstream fIn(filePath, std::ios::binary);
+  std::string str((std::istreambuf_iterator<char>(fIn)), {});
+  
+  return str;
+}
+void writeFileFromStr(const std::string& filePath, const std::string& str, bool chmodX) {
+  std::ofstream fOut(filePath);
+  fOut << str;
+  
+  fOut.close();
+  
+  if(chmodX)
+    fs::permissions(filePath, fs::perms::owner_exec | fs::perms::group_exec | fs::perms::others_exec, fs::perm_options::add);
+}
+
 int readFileLines(const std::string& filePath, std::vector<std::string>* strVect, int maxLines) {
   std::ifstream inFile(filePath);
   int lineCount = 0;
@@ -166,5 +182,15 @@ void replaceKeywordsAndWriteFile(std::string& filePathInAbs, std::string& folder
   std::filesystem::create_directory(filePathOutPath.parent_path());
   MyUtils::IO::writeFileLinesBinary(filePathOutFull, &stringArr);
 }
+
+// With MyArray
   
+MyArray::Array<std::string> readFileLines(const std::string& filePath) {
+  return Strings::strToStrArray(readFileFromStr(filePath));
 }
+
+void writeFileLines(const std::string& filePath, MyArray::Array<std::string> lines, bool chmodX) {
+  writeFileFromStr(filePath, Strings::strArrayToStr(lines), chmodX);
+}
+
+} // namespace MyUtils::IO
