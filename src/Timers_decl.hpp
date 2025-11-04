@@ -20,7 +20,7 @@ class TimerRegistry {
   : registryName_(registryName) {};
  public:
   static TimerRegistry& globalInstance() {
-    static TimerRegistry registry = TimerRegistry("Static Registry Instance");
+    static TimerRegistry registry = TimerRegistry("StaticRegistryInstance");
     return registry;
   }
   
@@ -111,7 +111,7 @@ class TimerRegistry {
   : registryName_(registryName) {};
  public:
   static TimerRegistry& globalInstance() {
-    static TimerRegistry registry = TimerRegistry("Global Instance");
+    static TimerRegistry registry = TimerRegistry("StaticRegistryInstance");
     return registry;
   }
   

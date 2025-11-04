@@ -25,7 +25,7 @@ inline std::string TimerRegistry::timingReportStr(int levelizeN, bool sortByStar
   double totalTime = std::chrono::duration<double>(std::chrono::high_resolution_clock::now()-totalStart_).count();
   std::string out2 = "Timer name | Timer value [s] | Share of registry total [%] | Start of timer [s]\n";
   
-  out2 += "* "+registryName_+" | "+std::to_string(totalTime)+" | "+"100"+" | "+"0 by definition"+"\n";
+  out2 += "*"+registryName_+" | "+std::to_string(totalTime)+" | "+"100"+" | "+"0 by definition"+"\n";
   
   if(sortByStartElseFinish)
     std::sort(timersOrdered_.raw().begin(), timersOrdered_.raw().end(), [&](const std::string& a, const std::string& b) {
