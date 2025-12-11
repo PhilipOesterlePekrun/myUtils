@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.25)
 project(myUtils)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+include(CMakeFunctions)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Set default install prefix if not provided by the user
@@ -54,6 +57,12 @@ install(EXPORT myUtilsTargets
     NAMESPACE myUtils::
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/myUtils
 )
+
+# --- Self-include ---
+#include_directories(
+#  "src"
+#  "src/Db"
+#)
 
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/myUtilsConfig.cmake"
 "

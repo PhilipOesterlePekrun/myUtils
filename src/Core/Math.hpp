@@ -1,5 +1,5 @@
 #pragma once
-#include "Core.hpp"
+#include "GlobalCore.hpp"
 
 #include <iostream>
 #include <math.h>

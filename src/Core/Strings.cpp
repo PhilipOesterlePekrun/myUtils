@@ -109,7 +109,7 @@ std::string trimZerosAfterDecimalPoint(const std::string& str) {
   return deleteInterval(str, pos+1, str.length());
 }
 
-// cf. replaceKeywordsAndWriteFile
+// cf. replaceKeywordsAndWriteFile //# DEPRECATED; TODO: remove this in favor of Keywords.hpp where we use MyArray and not raw arrays
 void replaceKeyword(std::vector<std::string>* stringArr, const std::string& kwText, const std::string& replace, int linesOut, int maxPerLine) {
   for(int i = 0; i<linesOut; i++) {
     int* checkForInArr;

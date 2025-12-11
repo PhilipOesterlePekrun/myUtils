@@ -1,5 +1,5 @@
 #pragma once
-#include "Core.hpp"
+#include "GlobalCore.hpp"
 
 #include <string>
 #include <vector>
@@ -23,16 +23,35 @@ class Array {
   // Fill with some default element value
   Array(size_t size, T value)
     : size_(size), data_(size, value) {}
-  // This constructor basically makes itself a copy of the input arg
-  Array(const Array& other)
-    : size_(other.size()), data_(other.raw()) {}
   // For literal
   Array(const std::vector<T>& raw)
     : size_(raw.size()), data_(raw) {}
     
+  // Copy ctor
+  Array(const Array& other)
+    : size_(other.size_), data_(other.data_) {}
+  
+  // Move ctor
+  Array(const Array&& other)
+    : size_(other.size_), data_(std::move(other.data_)) {
+    other.size_ = 0;
+    other.data_ = std::vector<T>(0);
+    return *this;
+  }
+    
+  // Copy assignment
   Array& operator=(const Array& other) {
-    size_ = other.size();
-    data_ = other.raw();
+    size_ = other.size_;
+    data_ = other.data_;
+    return *this;
+  }
+  
+  // Move assignment
+  Array& operator=(Array&& other) {
+    size_ = other.size_;
+    other.size_ = 0;
+    data_ = std::move(other.data_);
+    other.data_ = std::vector<T>(0);
     return *this;
   }
   

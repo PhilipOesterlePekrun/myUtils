@@ -1,5 +1,5 @@
 #pragma once
-#include "Core.hpp"
+#include "GlobalCore.hpp"
 
 #include <chrono>
 #include <string>
@@ -11,8 +11,8 @@
 namespace MyUtils::Timers {
 
 class Timer; // fwd decl
-////#define myUtils_ENABLE_TIMERS true //# tmp
-#if(defined(myUtils_ENABLE_TIMERS) && myUtils_ENABLE_TIMERS)
+
+#ifdef myUtils_ENABLE_TIMERS
   
 class TimerRegistry {
  public:

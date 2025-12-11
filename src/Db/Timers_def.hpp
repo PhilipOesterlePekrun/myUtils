@@ -5,7 +5,7 @@
 
 namespace MyUtils::Timers {
   
-#if(defined(myUtils_ENABLE_TIMERS) && myUtils_ENABLE_TIMERS)
+#ifdef myUtils_ENABLE_TIMERS
   
 inline void TimerRegistry::addTimer(const Timer& timer) {
   std::lock_guard<std::mutex> lock(mutex_);
@@ -46,7 +46,7 @@ inline std::string TimerRegistry::timingReportStr(int levelizeN, bool sortByStar
 #else
 
 inline std::string TimerRegistry::timingReportStr() const noexcept {
-  std::string out = "==== Timing Report : Timers are off (myUtils_ENABLE_TIMERS == false) ====\n";
+  std::string out = "==== Timing Report : Timers are off ((#ifdef myUtils_ENABLE_TIMERS) == false) ====\n";
   out += "Registry name: "+registryName_+"\n";
   double totalTime = std::chrono::duration<double>(std::chrono::high_resolution_clock::now()-totalStart_).count();
   out += "Total registry time | " + std::to_string(totalTime) + "s\n";
