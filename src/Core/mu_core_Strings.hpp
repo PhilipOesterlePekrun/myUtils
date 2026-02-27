@@ -1,10 +1,8 @@
 #pragma once
-#include "GlobalCore.hpp"
+#include "mu_core_GlobalCore.hpp"
 
 #include <string>
 #include <vector>
-
-#include "MyArray.hpp"
 
 namespace MyUtils {
   
@@ -34,11 +32,12 @@ double expNotationToDouble(const std::string& expText, int mantissaCharCount, in
 std::string trimZerosAfterDecimalPoint(std::string& str);
 
 // cf. replaceKeywordsAndWriteFile
-void replaceKeyword(std::vector<std::string>* stringArr, const std::string& kwText, const std::string& replace, int linesOut = strAndIO_maxLinesDefault, int maxPerLine = 20);
+void replaceKeyword(std::vector<std::string>* stringArr, const std::string& kwText, const std::string& replace);
 
 
 // // STRING UTILITIES INTENDED FOR EVENTUAL OUTPUT (TODOi: put these in myUtils eventually, but probably need to put Array and such in myUtils as well, which I should do anyways)
 inline std::string repeatStr(const std::string& s, int count) {
+  
   if(count <= 0)
     return "";
   std::string out = s;
@@ -48,12 +47,14 @@ inline std::string repeatStr(const std::string& s, int count) {
 }
 
 inline std::string levelizeString(const std::string& s, int level) {
+  using std::string;
+  
   if(level == 0)
     return s;
   // else
-  std::string lvlStr = repeatStr("\t", level);
+  string lvlStr = repeatStr("\t", level);
   
-  std::string tmpS = lvlStr;
+  string tmpS = lvlStr;
   FOR(i, s.length()) {
     tmpS += s[i];
     if(s[i] == '\n' && i!=s.length()-1)// -1 because we don't want to turn the last "\n" into "\n\t", or else the next thing is affected
@@ -62,10 +63,10 @@ inline std::string levelizeString(const std::string& s, int level) {
   return tmpS;
 }
 
-inline MyArray::Array<std::string> strToStrArray(const std::string& s) {
-  using MyArray::Array;
+inline std::vector<std::string> strToStrArray(const std::string& s) {
+  using std::vector;
   
-  auto out = Array<std::string>();
+  auto out = vector<std::string>();
   if(s == "") return out;
   out.push_back("");
   size_t sLength = s.length();
@@ -73,21 +74,21 @@ inline MyArray::Array<std::string> strToStrArray(const std::string& s) {
     if(i!=sLength-1 && s[i]=='\n')
       out.push_back("");
     else if(s[i]!='\n')
-      out(out.size()-1) += s[i];
+      out[out.size()-1] += s[i];
   }
   return out;
 }
-inline std::string strArrayToStr(const MyArray::Array<std::string>& a) {
+inline std::string strArrayToStr(const std::vector<std::string>& a) {
   std::string out = "";
   FOR(i, a.size())
-    out += a(i) + "\n";
+    out += a[i] + "\n";
   return out;
 }
 
-inline MyArray::Array<int> checkForIn(const std::string& checkFor, const std::string& checkIn) { // TODOi: remove the other checkForIn
-  using MyArray::Array;
+inline std::vector<int> checkForIn(const std::string& checkFor, const std::string& checkIn) { // TODOi: remove the other checkForIn
+  using std::vector;
   
-  auto out = Array<int>();
+  vector<int> out;
   std::string checkInTemp = checkIn;
   if (checkFor.length() <= checkIn.length()) {
     for (int i = 0; i <= checkIn.length()-checkFor.length(); ++i) {
@@ -105,37 +106,37 @@ inline MyArray::Array<int> checkForIn(const std::string& checkFor, const std::st
 
 // aligns the string rows at certain keys, like e.g. "|"" will be vertically aligned according to count (TODOm: make an overload for Array<std::string> where each ele is a row)
 inline std::string alignStringAt(const std::string& s, const std::string& alignerKey) {
-  using MyArray::Array;
+  using std::vector;
   
   auto a = strToStrArray(s);
   const int aSize = a.size();
-  auto maxSpacing = Array<int>();
-  Array<Array<int>> CFIs(aSize); // store for efficiency
+  vector<int> maxSpacing;
+  vector<vector<int>> CFIs(aSize); // store for efficiency
   FOR(i, aSize) {
-    auto cfi = checkForIn(alignerKey, a(i));
-    CFIs(i) = cfi;
+    auto cfi = checkForIn(alignerKey, a[i]);
+    CFIs[i] = cfi;
     if(cfi.size()==0)
       continue;
-    maxSpacing.extend(cfi.size() - maxSpacing.size());
-    if(cfi(0) > maxSpacing(0))
-      maxSpacing(0) = cfi(0);
+    maxSpacing.resize(cfi.size());
+    if(cfi[0] > maxSpacing[0])
+      maxSpacing[0] = cfi[0];
     FOR(j, cfi.size()-1)
-      if(cfi(j+1)-cfi(j) > maxSpacing(j+1))
-        maxSpacing(j+1) = cfi(j+1)-cfi(j);
+      if(cfi[j+1]-cfi[j] > maxSpacing[j+1])
+        maxSpacing[j+1] = cfi[j+1]-cfi[j];
   }
-  auto aOut = Array<std::string>(aSize);
+  auto aOut = vector<std::string>(aSize);
   FOR(i, aSize) {
-    auto& cfi = CFIs(i);
+    auto& cfi = CFIs[i];
     int dist = 0;
     int k = 0;
-    FOR(j, a(i).length()) {
-      if(k<cfi.size()) if(j == cfi(k)) {
-        int diff = maxSpacing(k)-(cfi(k)-dist);
-        aOut(i) += repeatStr(" ", diff);
-        dist = cfi(k);
+    FOR(j, a[i].length()) {
+      if(k<cfi.size()) if(j == cfi[k]) {
+        int diff = maxSpacing[k]-(cfi[k]-dist);
+        aOut[i] += repeatStr(" ", diff);
+        dist = cfi[k];
         ++k;
       }
-      aOut(i) += a(i)[j];
+      aOut[i] += a[i][j];
     }
   }
   return strArrayToStr(aOut);

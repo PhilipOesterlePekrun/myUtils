@@ -1,4 +1,4 @@
-#include "IO.hpp"
+#include "mu_core_IO.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -6,8 +6,6 @@
 #include <string>
 #include <vector>
 #include <math.h>
-#include <limits>
-#include <numbers>
 
 namespace MyUtils::IO {
 
@@ -81,7 +79,7 @@ void writeFileFromStr(const std::string& filePath, const std::string& str, bool 
     fs::permissions(filePath, fs::perms::owner_exec | fs::perms::group_exec | fs::perms::others_exec, fs::perm_options::add);
 }
 
-int readFileLines(const std::string& filePath, std::vector<std::string>* strVect, int maxLines) {
+void readFileLines(const std::string& filePath, std::vector<std::string>& strVect) {
   std::ifstream inFile(filePath);
   int lineCount = 0;
 
@@ -89,44 +87,30 @@ int readFileLines(const std::string& filePath, std::vector<std::string>* strVect
     throw std::ios_base::failure("Error opening file: " + filePath);
   }
   
-  if(strVect->size() == maxLines)
-    while (lineCount < maxLines && std::getline(inFile, strVect->at(lineCount)))
-      lineCount++;
   else {
     std::string lineTmp;
-    while (lineCount < maxLines && std::getline(inFile, lineTmp)) {
-      strVect->push_back(lineTmp);
-      lineCount++;
+    while (std::getline(inFile, lineTmp)) {
+      strVect.push_back(lineTmp);
     }
   }
-    
-
-  return lineCount;
 }
 
-void writeFileLines(const std::string& filePath, std::string* lines, int lineCount) {
+void writeFile(const std::string& filePath, const std::string& lines) {
   std::ofstream outFile(filePath);
 
   if (!outFile)
     throw std::ios_base::failure("Error writing to file: " + filePath);
 
-  for (int i = 0; i < lineCount; i++) {
-    outFile << lines[i];
-    if(i < lineCount - 1)
-      outFile << '\n';
-  }
+  outFile << lines;
 }
-void writeFileLines(const std::string& filePath, std::vector<std::string>* lines) {
+void writeFileLines(const std::string& filePath, const std::vector<std::string>& lines) {
   std::ofstream outFile(filePath);
 
   if (!outFile)
     throw std::ios_base::failure("Error writing to file: " + filePath);
 
-  for (int i = 0; i < lines->size(); i++) {
-    outFile << lines->at(i);
-    if(i < lines->size() - 1)
-      outFile << '\n';
-  }
+  FOR(i, lines.size())
+    outFile << lines[i]<<"\n";
 }
 
 void writeFileLinesBinary(const std::string& filePath, std::string* lines, int lineCount) {
@@ -185,11 +169,11 @@ void replaceKeywordsAndWriteFile(std::string& filePathInAbs, std::string& folder
 
 // With MyArray
   
-MyArray::Array<std::string> readFileLines(const std::string& filePath) {
+std::vector<std::string> readFileLines(const std::string& filePath) {
   return Strings::strToStrArray(readFileFromStr(filePath));
 }
 
-void writeFileLines(const std::string& filePath, MyArray::Array<std::string> lines, bool chmodX) {
+void writeFileLines(const std::string& filePath, std::vector<std::string> lines, bool chmodX) {
   writeFileFromStr(filePath, Strings::strArrayToStr(lines), chmodX);
 }
 

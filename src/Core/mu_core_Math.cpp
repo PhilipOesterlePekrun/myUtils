@@ -1,4 +1,4 @@
-#include "Math.hpp"
+#include "mu_core_Math.hpp"
 
 namespace MyUtils::Math {
 

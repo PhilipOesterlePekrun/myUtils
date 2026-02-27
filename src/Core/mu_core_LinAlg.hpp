@@ -1,19 +1,19 @@
 #pragma once
-#include <Global.hpp>
-
-#include "MyArray.hpp"
+#include "mu_core_GlobalCore.hpp"
 
 #include <algorithm>
+#include <vector>
+#include <string>
 
-namespace MyFem {
-
-namespace LinAlg {
+namespace MyUtils::LinAlg {
+  
+using std::vector;
 
 class Vectord {
   using size_t = std::size_t;
  private:
   size_t size_;
-  std::vector<double> data_;
+  vector<double> data_;
 
  public:
   // Default ctor
@@ -26,10 +26,10 @@ class Vectord {
   Vectord(const Vectord& other)
     : size_(other.size()), data_(other.raw()) {}
   // For literal
-  Vectord(const std::vector<double>& raw)
+  Vectord(const vector<double>& raw)
     : size_(raw.size()), data_(raw) {}
     
-  const std::vector<double>& raw() const {return data_;}
+  const vector<double>& raw() const {return data_;}
 
   // Access by (i, j)
   double& operator()(size_t i) {
@@ -41,10 +41,10 @@ class Vectord {
 
   size_t size() const {return size_;}
   
-  // Expose some raw std::vector functions
+  // Expose some raw vector functions
   void resize(size_t newSize) {
     size_ = newSize;
-    data_.resize(newSize);
+    data_.resize(newSize, 0.0);
   }
   ///void resize(size_t newSize, double val) {data_.resize(newSize);} //# I think unecessary
   void push_back(double ele) {
@@ -52,22 +52,35 @@ class Vectord {
     data_.push_back(ele);
   };
   
-  void deleteIndices(const Array<size_t>& indicesToDelete) {
-    Array<size_t> keepIndices;
-    for (size_t i = 0; i < size_; ++i) {
-      if(indicesToDelete.find((size_t)i).size()==0)
-        keepIndices.push_back(i);
+  void deleteIndices(std::vector<size_t> indicesToDelete) {
+    if (indicesToDelete.empty()) return;
+
+    std::sort(indicesToDelete.begin(), indicesToDelete.end());
+    indicesToDelete.erase(
+      std::unique(indicesToDelete.begin(), indicesToDelete.end()),
+      indicesToDelete.end()
+    );
+
+    // Optional: reject out-of-range indices (pick one policy).
+    if (!indicesToDelete.empty() && indicesToDelete.back() >= data_.size()) {
+      THROW("deleteIndices(): out of range");
     }
 
-    std::vector<double> newData(keepIndices.size());
-    for (size_t iNew = 0; iNew < keepIndices.size(); ++iNew) {
-      size_t iOld = keepIndices(iNew);
-      newData[iNew] = (*this)(iOld);
+    std::vector<double> newData;
+    newData.reserve(data_.size() - indicesToDelete.size());
+
+    size_t delPos = 0;
+    for (size_t i = 0; i < data_.size(); ++i) {
+      if (delPos < indicesToDelete.size() && indicesToDelete[delPos] == i) {
+        ++delPos;
+        continue;
+      }
+      newData.push_back(data_[i]);
     }
 
-    size_ = keepIndices.size();
-    data_ = std::move(newData);
+    data_.swap(newData);
   }
+  
   void extend(size_t newRowCount) {
     if (newRowCount < size_)
       throw std::invalid_argument("New row count must be >= current row count");
@@ -95,22 +108,8 @@ class Vectord {
   }
   
   inline void print(int eleStrLen = 5) const { //# we make inline for now
-  std::cout<<"[";
-  for(int i=0; i<size_; ++i) {
-    std::string tmpStr = std::to_string((*this)(i));
-    std::string tmpStr2;
-    for(int s=0; s<eleStrLen; ++s) {
-      if(s >= tmpStr.length())
-        tmpStr2 += " ";
-      else
-        tmpStr2 +=tmpStr[s];
-    }
-    std::cout<<tmpStr2;
-    if(i<size_-1)
-      std::cout<<" ";
+    
   }
-  std::cout<<"]^T\n";
-}
 };
   
 class Matrix2d {
@@ -129,8 +128,8 @@ class Matrix2d {
   // This constructor just duplicates other
   Matrix2d(const Matrix2d& other)
     : nRows_(other.nRows()), nCols_(other.nCols()), data_(other.raw()) {}
-  // This constructor makes the matrix from a raw flat std::vector and sets the rows and cols
-  Matrix2d(size_t rows, size_t cols, const std::vector<double>& flatVect)
+  // This constructor makes the matrix from a raw flat vector and sets the rows and cols
+  Matrix2d(size_t rows, size_t cols, const vector<double>& flatVect)
     : nRows_(rows), nCols_(cols), data_(flatVect) {}
     
   const Vectord& raw() const {return data_;}
@@ -177,8 +176,8 @@ class Matrix2d {
     return col;
   }
   
-  void deleteRows(const std::vector<size_t>& rowsToDelete) {
-    std::vector<size_t> keepRows;
+  void deleteRows(const vector<size_t>& rowsToDelete) {
+    vector<size_t> keepRows;
     for (size_t i = 0; i < nRows_; ++i) {
       if (std::find(rowsToDelete.begin(), rowsToDelete.end(), i) == rowsToDelete.end())
         keepRows.push_back(i);
@@ -194,8 +193,8 @@ class Matrix2d {
     nRows_ = keepRows.size();
     data_ = std::move(newData);
   }
-  void deleteCols(const std::vector<size_t>& colsToDelete) {
-    std::vector<size_t> keepCols;
+  void deleteCols(const vector<size_t>& colsToDelete) {
+    vector<size_t> keepCols;
     for (size_t j = 0; j < nCols_; ++j) {
       if (std::find(colsToDelete.begin(), colsToDelete.end(), j) == colsToDelete.end())
         keepCols.push_back(j);
@@ -344,8 +343,8 @@ class Matrix3d {
   // This constructor just duplicates other
   Matrix3d(const Matrix3d& other)
     : nI_(other.nI()), nJ_(other.nJ()), nK_(other.nK()), data_(other.raw()) {}
-  // This constructor makes the matrix from a raw flat std::vector and sets the rows and cols
-  Matrix3d(size_t I, size_t J, size_t K, const std::vector<double>& flatVect)
+  // This constructor makes the matrix from a raw flat vector and sets the rows and cols
+  Matrix3d(size_t I, size_t J, size_t K, const vector<double>& flatVect)
     : nI_(I), nJ_(J), nK_(K), data_(flatVect) {}
     
   const Vectord& raw() const {return data_;}
@@ -394,8 +393,8 @@ class Matrix3d {
     return col;
   }
   
-  void deleteRows(const std::vector<size_t>& rowsToDelete) {
-    std::vector<size_t> keepRows;
+  void deleteRows(const vector<size_t>& rowsToDelete) {
+    vector<size_t> keepRows;
     for (size_t i = 0; i < nRows_; ++i) {
       if (std::find(rowsToDelete.begin(), rowsToDelete.end(), i) == rowsToDelete.end())
         keepRows.push_back(i);
@@ -411,8 +410,8 @@ class Matrix3d {
     nRows_ = keepRows.size();
     data_ = std::move(newData);
   }
-  void deleteCols(const std::vector<size_t>& colsToDelete) {
-    std::vector<size_t> keepCols;
+  void deleteCols(const vector<size_t>& colsToDelete) {
+    vector<size_t> keepCols;
     for (size_t j = 0; j < nCols_; ++j) {
       if (std::find(colsToDelete.begin(), colsToDelete.end(), j) == colsToDelete.end())
         keepCols.push_back(j);
@@ -513,8 +512,8 @@ class Matrix4d {
   // This constructor just duplicates other
   Matrix4d(const Matrix4d& other)
     : nI_(other.nI()), nJ_(other.nJ()), nK_(other.nK()), nL_(other.nL()), data_(other.raw()) {}
-  // This constructor makes the matrix from a raw flat std::vector and sets the rows and cols
-  Matrix4d(size_t I, size_t J, size_t K, size_t L, const std::vector<double>& flatVect)
+  // This constructor makes the matrix from a raw flat vector and sets the rows and cols
+  Matrix4d(size_t I, size_t J, size_t K, size_t L, const vector<double>& flatVect)
     : nI_(I), nJ_(J), nK_(K), nL_(L), data_(flatVect) {}
     
   const Vectord& raw() const {return data_;}
@@ -564,8 +563,8 @@ class Matrix4d {
     return col;
   }
   
-  void deleteRows(const std::vector<size_t>& rowsToDelete) {
-    std::vector<size_t> keepRows;
+  void deleteRows(const vector<size_t>& rowsToDelete) {
+    vector<size_t> keepRows;
     for (size_t i = 0; i < nRows_; ++i) {
       if (std::find(rowsToDelete.begin(), rowsToDelete.end(), i) == rowsToDelete.end())
         keepRows.push_back(i);
@@ -581,8 +580,8 @@ class Matrix4d {
     nRows_ = keepRows.size();
     data_ = std::move(newData);
   }
-  void deleteCols(const std::vector<size_t>& colsToDelete) {
-    std::vector<size_t> keepCols;
+  void deleteCols(const vector<size_t>& colsToDelete) {
+    vector<size_t> keepCols;
     for (size_t j = 0; j < nCols_; ++j) {
       if (std::find(colsToDelete.begin(), colsToDelete.end(), j) == colsToDelete.end())
         keepCols.push_back(j);
@@ -798,6 +797,4 @@ inline Vectord solveLxb(const Matrix2d& A, const Vectord& b) { // TODO: add chec
   return x;
 }
 
-} //namespace LinAlg
-
-} // namespace MyFem
+} //namespace MyUtils::LinAlg

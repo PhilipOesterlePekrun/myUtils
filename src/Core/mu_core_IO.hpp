@@ -1,5 +1,5 @@
 #pragma once
-#include "GlobalCore.hpp"
+#include "mu_core_GlobalCore.hpp"
 
 #include <string>
 #include <vector>
@@ -15,7 +15,7 @@ int countFilesInFolder(const std::string& dirPath, const bool recursive);
 std::string readFileFromStr(const std::string& filePath);
 void writeFileFromStr(const std::string& filePath, const std::string& str, bool chmodX = false);
   
-int readFileLines(const std::string& filePath, std::vector<std::string>* strVect, int maxLines);
+void readFileLines(const std::string& filePath, std::vector<std::string>& strVect);
 
 void writeFileLines(const std::string& filePath, std::string* lines, int lineCount);
 void writeFileLines(const std::string& filePath, std::vector<std::string>* lines);
@@ -28,12 +28,13 @@ void replaceKeywordsAndWriteFile(std::string& filePathInAbs, std::string& folder
 
 }
 
-// With MyArray
-#include "MyArray.hpp"
+#include <vector>
 namespace MyUtils::IO {
   
-MyArray::Array<std::string> readFileLines(const std::string& filePath);
+using std::vector;
 
-void writeFileLines(const std::string& filePath, MyArray::Array<std::string> lines, bool chmodX = false);
+vector<std::string> readFileLines(const std::string& filePath);
+
+void writeFileLines(const std::string& filePath, vector<std::string> lines, bool chmodX = false);
 
 }

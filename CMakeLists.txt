@@ -6,34 +6,21 @@ include(CMakeFunctions)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Set default install prefix if not provided by the user
-if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    # Set install prefix next to the build directory
-    get_filename_component(_default_prefix "${CMAKE_BINARY_DIR}/../install" ABSOLUTE)
-    set(CMAKE_INSTALL_PREFIX "${_default_prefix}" CACHE PATH "Install path prefix" FORCE)
-endif()
-
-
 # Set C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 include(GNUInstallDirs)
 
+create_target_from_dir(Core, "Core/")
 
-# Sources (optional for now)
-file(GLOB_RECURSE myUtils_SOURCES CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
-)
+create_target_from_dir(Db, "Db/")
+
+create_target_from_dir(NumMethods, "NumMethods/")
+create_target_from_dir(Vis, "Vis/")
 
 # Add the library
-add_library(myUtils ${myUtils_SOURCES})
-
-# Include directory (public headers live in src/)
-target_include_directories(myUtils PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
-    $<INSTALL_INTERFACE:include>
-)
+add_library(myUtils Core Db NumMethods Vis)
 
 # Install library target
 install(TARGETS myUtils

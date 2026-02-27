@@ -1,8 +1,6 @@
-#include "Strings.hpp"
+#include "mu_core_Strings.hpp"
 
 #include <math.h>
-
-#include "Arrays.hpp"
 
 namespace MyUtils::Strings {
 
@@ -81,14 +79,16 @@ std::string keepInterval(const std::string& text, int from, int to) {
 
 // e.g. "-2.0952600000e-02" to -0.029526; expNotationToDouble("254.045e-01", 7, 2) correctly output 25.4045
 double expNotationToDouble(const std::string& expText, int mantissaCharCount, int expCharCount) {
+  using std::string;
+  
   short isNegative = 0;
   if (expText.at(0) == '-')
   {
     isNegative = 1;
   }
-  std::string left = keepInterval(expText, 0, mantissaCharCount-1+isNegative);
-  std::string expSignString = keepInterval(expText, mantissaCharCount+1+isNegative, mantissaCharCount+1+isNegative);
-  std::string right = keepInterval(expText, mantissaCharCount+2+isNegative, mantissaCharCount+1+expCharCount+isNegative);
+  string left = keepInterval(expText, 0, mantissaCharCount-1+isNegative);
+  string expSignString = keepInterval(expText, mantissaCharCount+1+isNegative, mantissaCharCount+1+isNegative);
+  string right = keepInterval(expText, mantissaCharCount+2+isNegative, mantissaCharCount+1+expCharCount+isNegative);
 
   int sign = 0;
   if (expSignString == "+") sign = 1;
@@ -110,22 +110,17 @@ std::string trimZerosAfterDecimalPoint(const std::string& str) {
 }
 
 // cf. replaceKeywordsAndWriteFile //# DEPRECATED; TODO: remove this in favor of Keywords.hpp where we use MyArray and not raw arrays
-void replaceKeyword(std::vector<std::string>* stringArr, const std::string& kwText, const std::string& replace, int linesOut, int maxPerLine) {
-  for(int i = 0; i<linesOut; i++) {
-    int* checkForInArr;
-    Arrays::allocate1DArray<int>(&checkForInArr, maxPerLine);
-    
-    int j=0;
-    while(true) {
-      checkForInArr = checkForIn(kwText, stringArr->at(i), maxPerLine);
-      if(checkForInArr[0]==-1) break;
+void replaceKeyword(std::vector<std::string>& stringArr, const std::string& kwText, const std::string& replace, int linesOut) {
+  using std::vector;
+  
+  FOR(i, linesOut) {
+    FOR(j) {
+      auto checkForInArr = checkForIn(kwText, stringArr[i]);
+      if(checkForInArr.size()==0) break;
 
-      std::string tmpLine = stringArr->at(i);
-      stringArr->at(i) = deleteInterval(tmpLine, checkForInArr[0], tmpLine.length())+replace+deleteInterval(tmpLine, 0, checkForInArr[0]+kwText.length()-1);
-      j++;
+      std::string tmpLine = stringArr[i];
+      stringArr[i] = deleteInterval(tmpLine, checkForInArr[0], tmpLine.length())+replace+deleteInterval(tmpLine, 0, checkForInArr[0]+kwText.length()-1);
     }
-    
-    free(checkForInArr);
   }
 }
 

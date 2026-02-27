@@ -1,11 +1,11 @@
 #pragma once
-#include "GlobalCore.hpp"
+#include "mu_core_GlobalCore.hpp"
 
 #include <iostream>
 #include <math.h>
 #include <numbers>
 
-#include "Constants.hpp"
+#include "mu_core_Constants.hpp"
 
 namespace MyUtils::Math {
 

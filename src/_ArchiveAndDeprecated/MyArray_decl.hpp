@@ -9,85 +9,94 @@ namespace MyUtils::MyArray {
 template<typename T>
 class Array {
   using size_t = std::size_t;
+  
  private:
-  size_t size_;
-  std::vector<T> data_;
+  size_t size_ = 0;
+  T* data_ = nullptr;
 
  public:
- // Default ctor
-  Array()
-    : size_(0), data_(0) {}
-  // Standard constructor
-  Array(size_t size)
-    : size_(size), data_(size) {}
-  // Fill with some default element value
-  Array(size_t size, T value)
-    : size_(size), data_(size, value) {}
-  // For literal
-  Array(const std::vector<T>& raw)
-    : size_(raw.size()), data_(raw) {}
-    
-  // Copy ctor
+  Array() = default;
+
+  explicit Array(size_t n)
+    : size_(n), data_(n ? new T[n] : nullptr) {}
+
+  Array(size_t n, const T& value)
+    : Array(n) {
+    for (size_t i = 0; i < size_; ++i) data_[i] = value;
+  }
+
+  Array(const std::vector<T>& v)
+    : Array(v.size()) {
+    for (size_t i = 0; i < size_; ++i) data_[i] = v[i];
+  }
+
+  ~Array() { delete[] data_; }
+
   Array(const Array& other)
-    : size_(other.size_), data_(other.data_) {}
-  
-  // Move ctor
-  Array(const Array&& other)
-    : size_(other.size_), data_(std::move(other.data_)) {
-    other.size_ = 0;
-    other.data_ = std::vector<T>(0);
-    return *this;
+    : Array(other.size_) {
+    for (size_t i = 0; i < size_; ++i) data_[i] = other.data_[i];
   }
-    
-  // Copy assignment
+
+  Array(Array&& other) noexcept
+    : size_(other.size_), data_(other.data_) {
+    other.size_ = 0;
+    other.data_ = nullptr;
+  }
+
   Array& operator=(const Array& other) {
-    size_ = other.size_;
-    data_ = other.data_;
+    if (this != &other) {
+      Array tmp(other);          // copy-construct
+      swap(tmp);                 // commit (strong-ish safety)
+    }
     return *this;
   }
-  
-  // Move assignment
-  Array& operator=(Array&& other) {
-    size_ = other.size_;
-    other.size_ = 0;
-    data_ = std::move(other.data_);
-    other.data_ = std::vector<T>(0);
+
+  Array& operator=(Array&& other) noexcept {
+    if (this != &other) {
+      delete[] data_;
+      data_ = other.data_;
+      size_ = other.size_;
+      other.data_ = nullptr;
+      other.size_ = 0;
+    }
     return *this;
   }
+
+  void swap(Array& o) noexcept {
+    std::swap(size_, o.size_);
+    std::swap(data_, o.data_);
+  }
+
+  T& operator[](size_t i) { return data_[i]; }
+  const T& operator[](size_t i) const { return data_[i]; }
+
+  T* raw() noexcept { return data_; }
+  const T* raw() const noexcept { return data_; }
+
+  size_t size() const noexcept { return size_; }
   
-  std::vector<T>& raw() {return data_;}
-  const std::vector<T>& raw() const {return data_;}
-
-  // Access by (i, j)
-  T& operator()(size_t i) {
-    return data_[i];
+  void resize(size_t newSize) {
+    T* newData = (T*)malloc(newSize*sizeof(T));
+    free(data_);
+    data_ = newData;
+    size_ = newSize;
+    data_.resize(newSize);
   }
-  const T& operator()(size_t i) const {
-    return data_[i];
-  }
-
-  size_t size() const {return size_;}
+  
+  void push_back(T ele) {
+    ++size_;
+    data_.push_back(ele);
+  };
   
   // Find ele with the value and return the positions of all occurances; if not found, return empty arr
-  Array<size_t> find(T val) const {
-    Array<size_t> arr = Array<size_t>();
+  Array<int> find(T val) const {
+    Array<int> arr = Array<int>();
     for(int i=0; i<size_; ++i) {
       if((*this)(i) == val)
         arr.push_back(i);
     }
     return arr;
   }
-  
-  // Expose some raw std::vector functions
-  void resize(size_t newSize) {
-    size_ = newSize;
-    data_.resize(newSize);
-  }
-  ///void resize(size_t newSize, double val) {data_.resize(newSize);} //# I think unecessary
-  void push_back(T ele) {
-    ++size_;
-    data_.push_back(ele);
-  };
   
   void deleteIndices(const Array<size_t>& indicesToDelete) {
     Array<size_t> keepIndices;

@@ -40,7 +40,7 @@ class TimerRegistry {
   //Array<Timer> timers_;
   std::chrono::high_resolution_clock::time_point totalStart_;
   std::unordered_map<std::string, Timer> timers_;
-  MyArray::Array<std::string> timersOrdered_;
+  std::vector<std::string> timersOrdered_;
 };
 
 class Timer { // TODOm: probably should all virtual destructor for memory stuff? so the destruction gets upcast? idk how it works honestly

@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+marker='// AUTO-GENERATED UMBRELLA HEADER. DO NOT EDIT.'
+
+usage() {
+  cat >&2 <<'EOF'
+Usage:
+  gen_umbrellas.sh [--force] [--dry-run] <top-level-dir>
+
+Behavior:
+  - For each directory D, potentially generates D/<basename(D)>.hpp
+  - Includes all local *.hpp files (excluding the generated file itself)
+  - Includes qualifying subdirectory umbrella headers as "subdir/subdir.hpp"
+  - A directory qualifies if:
+      (local *.hpp count >= 2) OR (it has any qualifying subdirectory)
+
+Safety:
+  - By default, will NOT overwrite an existing <basename>.hpp unless it already
+    contains the auto-generated marker line.
+  - Use --force to overwrite regardless.
+
+EOF
+  exit 2
+}
+
+force=0
+dry_run=0
+root=""
+
+while (( $# > 0 )); do
+  case "$1" in
+    --force) force=1; shift ;;
+    --dry-run) dry_run=1; shift ;;
+    -h|--help) usage ;;
+    *)
+      if [[ -z "$root" ]]; then
+        root="$1"
+        shift
+      else
+        usage
+      fi
+      ;;
+  esac
+done
+
+[[ -n "$root" ]] || usage
+[[ -d "$root" ]] || { echo "Error: not a directory: $root" >&2; exit 1; }
+root="$(cd "$root" && pwd)"
+
+process_dir() {
+  local dir="$1"
+  local base out
+  base="$(basename "$dir")"
+  out="$dir/$base.hpp"
+
+  # Recurse into subdirectories first (depth-first) so we know which sub-umbrellas exist.
+  local -a child_umbrellas=()
+  local child
+  while IFS= read -r -d '' child; do
+    local child_out
+    if child_out="$(process_dir "$child")"; then
+      child_umbrellas+=("$child_out")
+    fi
+  done < <(find "$dir" -mindepth 1 -maxdepth 1 -type d -print0 | LC_ALL=C sort -z)
+
+  # Collect local *.hpp (excluding the would-be umbrella itself).
+  local -a local_hpps=()
+  local f
+  while IFS= read -r -d '' f; do
+    [[ "$f" == "$out" ]] && continue
+    local_hpps+=("$f")
+  done < <(find "$dir" -mindepth 1 -maxdepth 1 -type f -name '*.hpp' -print0 | LC_ALL=C sort -z)
+
+  local local_count="${#local_hpps[@]}"
+  local child_count="${#child_umbrellas[@]}"
+
+  # Qualify rule:
+  # - Create umbrella if there are >=2 local headers OR any child umbrella exists.
+  if (( local_count < 2 && child_count == 0 )); then
+    # If an old auto-generated umbrella exists but no longer qualifies, remove it.
+    if [[ -f "$out" ]] && grep -qF "$marker" "$out"; then
+      if (( dry_run )); then
+        echo "Would remove $out" >&2
+      else
+        rm -f "$out"
+      fi
+    fi
+    return 1
+  fi
+
+  # If umbrella exists and we are not allowed to overwrite it, treat it as "present" for parents.
+  if [[ -f "$out" && $force -eq 0 ]] && ! grep -qF "$marker" "$out"; then
+    echo "Skipping $out (exists and not marked auto-generated). Use --force to overwrite." >&2
+    echo "$out"
+    return 0
+  fi
+
+  # Build umbrella content.
+  local tmp
+  tmp="$(mktemp)"
+  {
+    echo "$marker"
+    echo "#pragma once"
+    echo
+    # Local headers: include by basename (relative to this directory).
+    for f in "${local_hpps[@]}"; do
+      echo "#include \"$(basename "$f")\""
+    done
+    # Child umbrellas: include by path relative to current dir.
+    for f in "${child_umbrellas[@]}"; do
+      echo "#include \"${f#"$dir"/}\""
+    done
+  } > "$tmp"
+
+  if (( dry_run )); then
+    echo "Would write $out" >&2
+    rm -f "$tmp"
+  else
+    mv "$tmp" "$out"
+  fi
+
+  echo "$out"
+  return 0
+}
+
+process_dir "$root" >/dev/null || true
