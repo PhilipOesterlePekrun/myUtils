@@ -7,30 +7,27 @@ endfunction()
 function(create_target_from_dir target dir)
   get_filename_component(root "${dir}" ABSOLUTE)
 
-  file(GLOB_RECURSE CONFIGURE_DEPENDS src
-    "${root}/*.cpp"
-  )
-  file(GLOB_RECURSE CONFIGURE_DEPENDS hdr
-    "${root}/*.hpp"
-  )
+  file(GLOB_RECURSE CONFIGURE_DEPENDS src "${root}/*.cpp")
+  file(GLOB_RECURSE CONFIGURE_DEPENDS hdr "${root}/*.hpp")
 
   list(FILTER src EXCLUDE REGEX ".*/_EXCLUDE_.*")
   list(FILTER hdr EXCLUDE REGEX ".*/_EXCLUDE_.*")
 
-  set(inc_dirs "")
-  foreach(h IN LISTS hdr)
-    get_filename_component(d "${h}" DIRECTORY)
-    list(APPEND inc_dirs "${d}")
-  endforeach()
-  list(REMOVE_DUPLICATES inc_dirs)
+  set(build_root "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
   list(LENGTH src nsrc)
   if(nsrc EQUAL 0)
     add_library(${target} INTERFACE)
     target_sources(${target} INTERFACE ${hdr})
-    target_include_directories(${target} INTERFACE ${inc_dirs})
+    target_include_directories(${target} INTERFACE
+      $<BUILD_INTERFACE:${build_root}>              # enables <Core/...> in-tree
+      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>  # enables <myUtils/...> after install
+    )
   else()
     add_library(${target} ${src} ${hdr})
-    target_include_directories(${target} PUBLIC ${inc_dirs})
+    target_include_directories(${target} PUBLIC
+      $<BUILD_INTERFACE:${build_root}>
+      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    )
   endif()
 endfunction()

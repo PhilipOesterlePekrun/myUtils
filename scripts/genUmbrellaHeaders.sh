@@ -57,14 +57,14 @@ process_dir() {
   if [[ "$dir" == "$root" ]]; then
     rel=""
   else
-    rel="${dir#"$root"/}"   # e.g. "Core/Math"
+    rel="${dir#"$root"/}"
   fi
   if [[ -z "$rel" ]]; then
-    out="$dir/${top}.hpp"          # root umbrella: mu.hpp
+    out="$dir/${top}.hpp"
   else
-    name="${rel//\//_}"            # Core/Math -> Core_Math
-    name="${name,,}"               # -> core_math
-    out="$dir/${top}_${name}.hpp"  # -> mu_core_math.hpp
+    name="${rel//\//_}"
+    name="${name,,}"
+    out="$dir/../${name}.hpp"
   fi
 
   # Recurse into subdirectories first (depth-first) so we know which sub-umbrellas exist.
