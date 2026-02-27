@@ -12,15 +12,25 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 include(GNUInstallDirs)
 
-create_target_from_dir(Core, "Core/")
+create_target_from_dir(Core "Core/")
 
-create_target_from_dir(Db, "Db/")
+create_target_from_dir(Db "Db/")
 
-create_target_from_dir(NumMethods, "NumMethods/")
-create_target_from_dir(Vis, "Vis/")
+create_target_from_dir(NumMethods "NumMethods/")
+create_target_from_dir(Vis "Vis/")
 
 # Add the library
-add_library(myUtils Core Db NumMethods Vis)
+add_library(myUtils INTERFACE)
+target_link_libraries(myUtils INTERFACE Core Db NumMethods Vis)
+
+# Top level mu.hpp
+target_include_directories(myUtils INTERFACE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+target_sources(myUtils INTERFACE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/mu.hpp>
+)
 
 # Install library target
 install(TARGETS myUtils

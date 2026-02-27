@@ -8,10 +8,10 @@ function(create_target_from_dir target dir)
   get_filename_component(root "${dir}" ABSOLUTE)
 
   file(GLOB_RECURSE CONFIGURE_DEPENDS src
-    "${root}/*.c" "${root}/*.cpp"
+    "${root}/*.cpp"
   )
   file(GLOB_RECURSE CONFIGURE_DEPENDS hdr
-    "${root}/*.h" "${root}/*.hpp"
+    "${root}/*.hpp"
   )
 
   list(FILTER src EXCLUDE REGEX ".*/_EXCLUDE_.*")
@@ -29,10 +29,8 @@ function(create_target_from_dir target dir)
     add_library(${target} INTERFACE)
     target_sources(${target} INTERFACE ${hdr})
     target_include_directories(${target} INTERFACE ${inc_dirs})
-    target_compile_features(${target} INTERFACE cxx_std_17)
   else()
     add_library(${target} ${src} ${hdr})
     target_include_directories(${target} PUBLIC ${inc_dirs})
-    target_compile_features(${target} PUBLIC cxx_std_17)
   endif()
 endfunction()
