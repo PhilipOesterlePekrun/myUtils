@@ -12,62 +12,30 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 include(GNUInstallDirs)
 
-create_target_from_dir(Core "Core/")
+create_target_from_dir(Core "src/Core/")
 
-create_target_from_dir(Db "Db/")
+create_target_from_dir(Db "src/Db/")
 
-create_target_from_dir(NumMethods "NumMethods/")
-create_target_from_dir(Vis "Vis/")
+create_target_from_dir(NumMethods "src/NumMethods/")
+create_target_from_dir(Vis "src/Vis/")
 
-# Add the library
 add_library(myUtils INTERFACE)
 target_link_libraries(myUtils INTERFACE Core Db NumMethods Vis)
 
-# Top level mu.hpp
 target_include_directories(myUtils INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
-target_sources(myUtils INTERFACE
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/mu.hpp>
+
+install(TARGETS myUtils Core Db NumMethods Vis
+  EXPORT myUtilsTargets
 )
 
-# Install library target
-install(TARGETS myUtils
-    EXPORT myUtilsTargets
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
-
-# Install all .hpp files from src/ EXCEPT myUtils.hpp into include/myUtils/
-install(DIRECTORY src/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/myUtils
-        FILES_MATCHING PATTERN "*.hpp"
-                       PATTERN "myUtils.hpp" EXCLUDE)
-
-# Install myUtils.hpp to include/ directly
-install(FILES src/myUtils.hpp DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-# Export target info for downstream usage
 install(EXPORT myUtilsTargets
-    FILE myUtilsTargets.cmake
-    NAMESPACE myUtils::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/myUtils
-)
-
-# --- Self-include ---
-#include_directories(
-#  "src"
-#  "src/Db"
-#)
-
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/myUtilsConfig.cmake"
-"
-include(\"\${CMAKE_CURRENT_LIST_DIR}/myUtilsTargets.cmake\")
-")
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/myUtilsConfig.cmake"
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/myUtils
 )
+
+install(FILES "src/mu.hpp" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # Create test executable
 add_executable(test

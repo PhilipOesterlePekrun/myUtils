@@ -7,3 +7,4 @@
 #include "MyArray_decl.hpp"
 #include "MyArray_def.hpp"
 #include "myUtils.hpp"
+#include "TestDir/mu__archiveanddeprecated_testdir.hpp"
