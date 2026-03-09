@@ -2,3 +2,5 @@
 #pragma once
 
 #include "mu_nummethods_NumIntegration.hpp"
+#include "mu_nummethods_PolynomialAnalytic.hpp"
+#include "mu_nummethods_linsolvers.hpp"

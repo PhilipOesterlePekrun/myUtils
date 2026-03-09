@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdexcept>
+#include <stdexcept> // required for MU_THROW()
 
 // // HELPER MACROS
 
@@ -9,4 +9,5 @@
 //#define FOR(i, n) for(int i = 0; i < (n); ++i)
 //#define FOR(i) for(int i = 0;; ++i)
 
+#define MU_STATUS(msg) std::cout<<"MU_STATUS: "<<msg<<"\n";
 #define MU_THROW(msg) throw std::runtime_error(msg)
