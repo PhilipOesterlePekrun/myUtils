@@ -1,5 +1,5 @@
 #pragma once
-#include "GlobalCore.hpp"
+#include "mu_core_GlobalCore.hpp"
 
 #include <string>
 #include <vector>

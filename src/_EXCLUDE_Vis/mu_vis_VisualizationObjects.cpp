@@ -1,6 +1,6 @@
-#include "VisualizationObjects.hpp"
+#include "mu_vis_VisualizationObjects.hpp"
 
-#include "VisualizationBase.hpp"
+#include "mu_vis_VisualizationBase.hpp"
 
 #include <SFML/Graphics.hpp>
 

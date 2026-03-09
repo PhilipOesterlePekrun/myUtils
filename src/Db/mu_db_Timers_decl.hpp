@@ -1,12 +1,10 @@
 #pragma once
-#include "GlobalCore.hpp"
+#include "mu_core_GlobalCore.hpp"
 
 #include <chrono>
 #include <string>
 #include <mutex>
 #include <unordered_map>
-
-#include "MyArray.hpp"
 
 namespace MyUtils::Timers {
 
@@ -37,7 +35,6 @@ class TimerRegistry {
  private:
   std::string registryName_;
   mutable std::mutex mutex_;
-  //Array<Timer> timers_;
   std::chrono::high_resolution_clock::time_point totalStart_;
   std::unordered_map<std::string, Timer> timers_;
   std::vector<std::string> timersOrdered_;

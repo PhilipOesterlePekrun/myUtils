@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "Strings.hpp"
+#include "mu_core_Strings.hpp"
 
 namespace MyUtils::IO {
   

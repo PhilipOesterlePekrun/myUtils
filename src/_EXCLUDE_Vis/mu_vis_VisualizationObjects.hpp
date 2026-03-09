@@ -1,8 +1,9 @@
 #pragma once
-#include <Global.hpp>
+#include "mu_core_GlobalCore.hpp"
 
-#include <myUtils.hpp>
 #include <SFML/Graphics.hpp>
+
+#include "mu.hpp"
 
 namespace MyFem::Vis {
   

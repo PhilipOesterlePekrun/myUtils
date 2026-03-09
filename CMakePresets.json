@@ -12,12 +12,13 @@
     "generator": "Ninja",
     "cacheVariables": {
       "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-      "CMAKE_INSTALL_PREFIX": "../install_2",
+      "CMAKE_INSTALL_PREFIX": "../install",
       "CMAKE_BUILD_TYPE": "DEBUG",
       "CMAKE_CXX_COMPILER": "g++",
       "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
       "CMAKE_C_COMPILER": "gcc",
-      "CMAKE_C_COMPILER_LAUNCHER": "ccache"
+      "CMAKE_C_COMPILER_LAUNCHER": "ccache",
+      "_COMMENT_SFML_ROOT": "/home/oesterle/misc/tpl/SFML_base/install"
     }
     }
   ]

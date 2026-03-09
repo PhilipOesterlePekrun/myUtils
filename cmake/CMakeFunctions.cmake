@@ -6,6 +6,7 @@ function(commentBlock)
 endfunction()
 
 # This function creates the target with the necessary includes; propagates into subdirectories
+# MAY NOT WORK CORRECTLY CURRENTLY
 function(create_target_from_dir target dir)
   get_filename_component(root "${PROJECT_SOURCE_DIR}/${dir}" ABSOLUTE)
 

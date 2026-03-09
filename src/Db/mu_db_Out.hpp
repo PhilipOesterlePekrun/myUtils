@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mu_core_Strings.hpp>
+#include <iostream>
   
 // // DEBUG FUNCTIONALITY
 namespace MyUtils::Db {
@@ -9,7 +10,7 @@ namespace MyUtils::Db {
 inline void pr(const std::string& s = "", int level = 0) {
   #ifdef myUtils_DbPr_ON
   std::string sTot = "-- DEBUG PRINT --\n"+s+"\n";
-  std::cout<<levelizeString(sTot, level);
+  std::cout<<Strings::levelizeString(sTot, level);
   #endif
 }
 
@@ -17,7 +18,7 @@ inline void pr(const std::string& s = "", int level = 0) {
 inline void warn(const std::string& s, int level = 0) {
   #ifdef myUtils_DbPr_ON
   std::string sTot = "-- WARNING --\n"+s+"\n";
-  std::cout<<levelizeString(sTot, level);
+  std::cout<<Strings::levelizeString(sTot, level);
   #endif
 }
 

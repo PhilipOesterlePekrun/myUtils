@@ -6,4 +6,5 @@
 #include "mu_core_IO.hpp"
 #include "mu_core_LinAlg.hpp"
 #include "mu_core_Math.hpp"
+#include "mu_core_StdVectorUtils.hpp"
 #include "mu_core_Strings.hpp"

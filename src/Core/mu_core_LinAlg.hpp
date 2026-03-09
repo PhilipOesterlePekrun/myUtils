@@ -5,6 +5,9 @@
 #include <vector>
 #include <string>
 
+#include "mu_core_Math.hpp"
+#include "mu_db.hpp"
+
 namespace MyUtils::LinAlg {
   
 using std::vector;
@@ -51,6 +54,10 @@ class Vectord {
     ++size_;
     data_.push_back(ele);
   };
+  void pop_back() {
+    --size_;
+    data_.pop_back();
+  };
   
   void deleteIndices(std::vector<size_t> indicesToDelete) {
     if (indicesToDelete.empty()) return;
@@ -63,7 +70,7 @@ class Vectord {
 
     // Optional: reject out-of-range indices (pick one policy).
     if (!indicesToDelete.empty() && indicesToDelete.back() >= data_.size()) {
-      THROW("deleteIndices(): out of range");
+      MU_THROW("deleteIndices(): out of range");
     }
 
     std::vector<double> newData;
@@ -108,7 +115,21 @@ class Vectord {
   }
   
   inline void print(int eleStrLen = 5) const { //# we make inline for now
-    
+    std::cout<<"[";
+    for(int i=0; i<size_; ++i) {
+      std::string tmpStr = std::to_string((*this)(i));
+      std::string tmpStr2;
+      for(int s=0; s<eleStrLen; ++s) {
+        if(s >= tmpStr.length())
+          tmpStr2 += " ";
+        else
+          tmpStr2 +=tmpStr[s];
+      }
+      std::cout<<tmpStr2;
+      if(i<size_-1)
+        std::cout<<" ";
+    }
+    std::cout<<"]^T\n";
   }
 };
   
@@ -147,8 +168,8 @@ class Matrix2d {
   size_t nRows() const {return nRows_;}
   size_t nCols() const {return nCols_;}
   
-  Array<size_t> dims() const {
-    return Array<size_t>{{nRows_, nCols_}};
+  vector<size_t> dims() const {
+    return vector<size_t>{{nRows_, nCols_}};
   }
   
   Vectord rowAt(size_t i) {
@@ -363,8 +384,8 @@ class Matrix3d {
   size_t nJ() const {return nJ_;}
   size_t nK() const {return nK_;}
   
-  Array<size_t> dims() const {
-    return Array<size_t>{{nI_, nJ_, nK_}};
+  vector<size_t> dims() const {
+    return vector<size_t>{{nI_, nJ_, nK_}};
   }
   
   /*TODO
@@ -533,8 +554,8 @@ class Matrix4d {
   size_t nK() const {return nK_;}
   size_t nL() const {return nL_;}
   
-  Array<size_t> dims() const {
-    return Array<size_t>{{nI_, nJ_, nK_, nL_}};
+  vector<size_t> dims() const {
+    return vector<size_t>{{nI_, nJ_, nK_, nL_}};
   }
   
   /*TODO
@@ -676,10 +697,10 @@ inline int diracDelta(int i, int j) {
 }
 
 // Operators linalg
-inline Vectord scaleVect2d(double sc, const Vectord& v) {
+inline Vectord scaleVectd(double sc, const Vectord& v) {
   Vectord r(v.size());
   for(int i=0; i<v.size(); ++i)
-    r(i) += sc*v(i);
+    r(i) = sc*v(i);
   return r;
 }
 inline Matrix2d scaleMat2d(double sc, const Matrix2d& mat) {
@@ -689,7 +710,7 @@ inline Matrix2d scaleMat2d(double sc, const Matrix2d& mat) {
       r(i, j) = sc*mat(i, j);
   return r;
 }
-inline Vectord vect2dPlusVect2d(const Vectord& v1, const Vectord& v2) {
+inline Vectord vectdPlusVectd(const Vectord& v1, const Vectord& v2) {
   Vectord r(v1.size());
   for(int i=0; i<v1.size(); ++i)
     r(i) = v1(i)+v2(i);
@@ -702,25 +723,25 @@ inline Matrix2d mat2dPlusMat2d(const Matrix2d& mat1, const Matrix2d& mat2) {
       r(i, j) = mat1(i, j)+mat2(i, j);
   return r;
 }
-inline double vect2dDotVect2d(const Vectord& v1, const Vectord& v2) {
+inline double vectdDotVectd(const Vectord& v1, const Vectord& v2) {
   double r = 0.0;
   for(int i=0; i<v1.size(); ++i)
     r += v1(i)*v2(i);
   return r;
 }
-//using vect2dInnerVect2d = vect2dDotVect2d; // TODO: think about best way to alias, if that even makes sense
-inline Matrix2d vect2dOuterVect2d(const Vectord& v1, const Vectord& v2) {
+//using vectdInnerVectd = vectdDotVectd; // TODO: think about best way to alias, if that even makes sense
+inline Matrix2d vectdOuterVectd(const Vectord& v1, const Vectord& v2) {
   Matrix2d r(v1.size(), v2.size());
   for(int i=0; i<v1.size(); ++i)
     for(int j=0; j<v2.size(); ++j)
       r(i, j) = v1(i)*v2(j);
   return r;
 }
-//using vect2dDyadicVect2d = vect2dOuterVect2d; // TODO: think about best way to alias, if that even makes sense
+//using vectdDyadicVectd = vectdOuterVectd; // TODO: think about best way to alias, if that even makes sense
 inline Vectord mat2dTimesVectd(const Matrix2d& mat, const Vectord& v) {
   Vectord r(mat.nRows());
   for(int i=0; i<mat.nRows(); ++i)
-    r(i) = vect2dDotVect2d(mat.rowAt(i), v);
+    r(i) = vectdDotVectd(mat.rowAt(i), v);
   return r;
 }
 inline Matrix2d mat2dTimesMat2d(const Matrix2d& mat1, const Matrix2d& mat2) {//unfinished
@@ -730,7 +751,7 @@ inline Matrix2d mat2dTimesMat2d(const Matrix2d& mat1, const Matrix2d& mat2) {//u
   Matrix2d r(rNr, rNc);
   for(int i=0; i<rNr; ++i)
     for(int j=0; j<rNc; ++j) {
-      r(i, j) = vect2dDotVect2d(mat1.rowAt(i), mat2.colAt(j));
+      r(i, j) = vectdDotVectd(mat1.rowAt(i), mat2.colAt(j));
     }
   return r;
 }
@@ -750,20 +771,20 @@ inline Matrix2d symmetrizeMat2d(const Matrix2d& mat) {
 
 inline double detMat2d(const Matrix2d& mat) {
   if(mat.nRows() != mat.nCols())
-    db::throwAndExit("mat.nRows() != mat.nCols()");
+    MU_THROW("mat.nRows() != mat.nCols()");
   else if(mat.nRows() == 1)
     return mat(0,0);
   else if(mat.nRows() == 2)
     return mat(0,0)*mat(1,1) - mat(1,0)*mat(0,1);
   else
-    db::throwAndExit("det for n>2 not yet implemented"); // TODO
+    MU_THROW("det for n>2 not yet implemented"); // TODO
   return 0.0; // return who even cares
 }
 
 // Only for small matrices
 inline Matrix2d invertMat2d(Matrix2d mat) {
   if(mat.nRows() != mat.nCols())
-    db::throwAndExit("mat.nRows() != mat.nCols()");
+    MU_THROW("mat.nRows() != mat.nCols()");
   else if(mat.nRows() == 1) {
     Matrix2d r(1, 1,
       {1.0/mat(0,0)});
@@ -779,7 +800,7 @@ inline Matrix2d invertMat2d(Matrix2d mat) {
     return scaleMat2d(1.0/detMat2d(mat), r);
   }
   else
-    db::throwAndExit("invert for n>2 not yet implemented");
+    MU_THROW("invert for n>2 not yet implemented");
   return Matrix2d(0, 0); // return empty I guess whatever man
 }
 
@@ -792,7 +813,7 @@ inline Vectord solveLxb(const Matrix2d& A, const Vectord& b) { // TODO: add chec
     FOR(j, i) {
       otherAx += A(i,j)*x(j);
     }
-    x(i) = Utils::Math::CommonFunctions::inv(A(i,i))*(b(i) - otherAx); // TODO: alias Utils::Math::CommonFunctions::inv(
+    x(i) = Math::CommonFunctions::inv(A(i,i))*(b(i) - otherAx); // TODO: alias Utils::Math::CommonFunctions::inv(
   }
   return x;
 }

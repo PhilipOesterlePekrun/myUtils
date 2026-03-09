@@ -1,4 +1,4 @@
-#include "VisualizationBase.hpp"
+#include "mu_vis_VisualizationBase.hpp"
 
 namespace MyFem::Vis {
 

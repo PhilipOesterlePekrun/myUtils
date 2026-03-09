@@ -1,10 +1,10 @@
 #pragma once
-#include <Global.hpp>
+#include "mu_core_GlobalCore.hpp"
 
-#include <myUtils.hpp>
 #include <SFML/Graphics.hpp>
 
-#include "VisualizationObjects.hpp"
+#include "mu.hpp"
+#include "mu_vis_VisualizationObjects.hpp"
 
 namespace MyFem {
 

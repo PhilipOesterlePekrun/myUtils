@@ -32,7 +32,7 @@ double expNotationToDouble(const std::string& expText, int mantissaCharCount, in
 std::string trimZerosAfterDecimalPoint(std::string& str);
 
 // cf. replaceKeywordsAndWriteFile
-void replaceKeyword(std::vector<std::string>* stringArr, const std::string& kwText, const std::string& replace);
+void replaceKeyword(std::vector<std::string>& stringArr, const std::string& kwText, const std::string& replace);
 
 
 // // STRING UTILITIES INTENDED FOR EVENTUAL OUTPUT (TODOi: put these in myUtils eventually, but probably need to put Array and such in myUtils as well, which I should do anyways)

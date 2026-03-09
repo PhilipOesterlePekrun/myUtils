@@ -1,7 +1,7 @@
 #pragma once
-#include "Timers_decl.hpp"
+#include "mu_db_Timers_decl.hpp"
 
-#include "Strings.hpp"
+#include "mu_core_Strings.hpp"
 
 namespace MyUtils::Timers {
   
@@ -28,12 +28,12 @@ inline std::string TimerRegistry::timingReportStr(int levelizeN, bool sortByStar
   out2 += "*"+registryName_+" | "+std::to_string(totalTime)+" | "+"100"+" | "+"0 by definition"+"\n";
   
   if(sortByStartElseFinish)
-    std::sort(timersOrdered_.raw().begin(), timersOrdered_.raw().end(), [&](const std::string& a, const std::string& b) {
+    std::sort(timersOrdered_.begin(), timersOrdered_.end(), [&](const std::string& a, const std::string& b) {
       return timers_.at(a).start_ < timers_.at(b).start_;
     });
   
   FOR(i, timersOrdered_.size()) {
-    const std::string& name = timersOrdered_(i);
+    const std::string& name = timersOrdered_[i];
     const Timer& timer = timers_.at(name);
     double timerVal = timer.getTimerVal_secDouble();
     double shareOfTotal = timerVal/totalTime;
