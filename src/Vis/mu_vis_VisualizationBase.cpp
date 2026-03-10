@@ -1,6 +1,6 @@
 #include "mu_vis_VisualizationBase.hpp"
 
-namespace MyFem::Vis {
+namespace MyUtils::Vis {
 
 void VisualizationBase::drawBaseUI() {
 	// pause bar and symbol
@@ -154,7 +154,7 @@ void VisualizationBase::drawFrame() {
 		renderWindow_.clear(baseColor_);
     drawBaseUI();
     FOR(i, objects_.size()) {
-      objects_(i)->draw();
+      objects_[i]->draw();
     }
 		drawFrameImplementation();
 		renderWindow_.display();
@@ -165,4 +165,4 @@ void VisualizationBase::drawFrame() {
 	}
 }
 
-} // namespace MyFem
+} // namespace MyUtils::Vis

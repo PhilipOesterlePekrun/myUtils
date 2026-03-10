@@ -3,43 +3,44 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "mu.hpp"
 #include "mu_vis_VisualizationObjects.hpp"
+#include "mu_db.hpp"
 
-namespace MyFem {
-
-namespace Vis {
+namespace MyUtils::Vis {
+  
+using std::vector;
   
 ///class Object; // forward decl
   
 class VisualizationBase {
   // UTILITIES (public because can also be used by visuaalization objects and such)
  public:
-	inline sf::Vector2f Vector2fInXY(float posX, float posY){
+	sf::Vector2f Vector2fInXY(float posX, float posY){
 		return sf::Vector2f(posX,windowHeight_-posY);
 	}
   
 	sf::Text textConstructorXY(const std::string& textString, float posX, float posY, int fontSize, sf::Color fillColor, sf::Font* font);
   // Overloads
-  inline sf::Text textConstructorXY(const std::string& textString, float posX, float posY, int fontSize, sf::Color fillColor) {
+  sf::Text textConstructorXY(const std::string& textString, float posX, float posY, int fontSize, sf::Color fillColor) {
     return textConstructorXY(textString, posX, posY, fontSize, fillColor, defaultFont_);
   };
-  inline sf::Text textConstructorXY(const std::string& textString, float posX, float posY, int fontSize) {
+  sf::Text textConstructorXY(const std::string& textString, float posX, float posY, int fontSize) {
     return textConstructorXY(textString, posX, posY, fontSize, defaultTextColor_, defaultFont_);
   };
-  inline sf::Text textConstructorXY(const std::string& textString, float posX, float posY) {
+  sf::Text textConstructorXY(const std::string& textString, float posX, float posY) {
     return textConstructorXY(textString, posX, posY, defaultFontSize_, defaultTextColor_, defaultFont_);
   };
   
   // CONSTRUCTORS
  public:
-	inline VisualizationBase(){} // default constructor
+	VisualizationBase() {} // default constructor
 	VisualizationBase(std::string title, int windowWidth, int windowHeight, int framerate, sf::Color baseColor, sf::Color secondaryColor, sf::Color defaultTextColor, sf::Font* defaultFont, int defaultFontSize);
 	VisualizationBase(std::string title, int windowWidth, int windowHeight, int framerate, sf::Color baseColor, sf::Color secondaryColor, sf::Color defaultTextColor, sf::Font* defaultFont, int defaultFontSize, int antiAliasingLevel); // (antiAliasingLevel = 0) == off
   
   // LOGICAL FUNCTIONS
 	bool activate();
 	bool deactivate();
+  bool isActive() const {return active_;}
 	bool play();
 	bool pause();
   bool goToFrame(int toFrame);
@@ -57,16 +58,16 @@ class VisualizationBase {
   
   // VISUALIZATION OBJECTS
  private: // public because zero reason to be private or protected. just edit it directly, no issue.
-  Array<Object*> objects_;
+  vector<Object*> objects_;
  public:
   // attaches additional objects, in addition to the ones already attached
-  void attachObjects(const Array<Object*>& objects) { // TODO: these functions could be better named
+  void attachObjects(const vector<Object*>& objects) { // TODO: these functions could be better named
     FOR(i, objects.size()) {
-      if(objects(i)->isAttached())
-        warn("Some objects were already attached/activated and have not been attached as desired");
+      if(objects[i]->isAttached())
+        Db::warn("Some objects were already attached/activated and have not been attached as desired");
       else {
-        objects_.push_back(objects(i));
-        objects(i)->attach(this); // yeah its the param but the element is a pointer, so this works
+        objects_.push_back(objects[i]);
+        objects[i]->attach(this); // yeah its the param but the element is a pointer, so this works
       }
     }
   }
@@ -75,15 +76,17 @@ class VisualizationBase {
   }
 
   // GETTERS
- protected:
-  inline unsigned int getMaxFrame() {
-    return framerate_*maxTime_.asSeconds();
-  }
-	inline const sf::Time currentTime() {
+  sf::Time currentTime() const {
     return sf::Time(sf::seconds((float)currentFrame_/framerate_));
   }
+  int currentFrame() const {
+    return currentFrame_;
+  }
+  unsigned int getMaxFrame() const {
+    return framerate_*maxTime_.asSeconds();
+  }
   
-/*static inline void loadFont(sf::Font *fontObj, std::string filePath) {
+/*static void loadFont(sf::Font *fontObj, std::string filePath) {
 	if(!fontObj->loadFromFile(filePath)){
 		std::cout<<"ERROR: Cannot load font"<<"\n";
 	}
@@ -112,6 +115,4 @@ class VisualizationBase {
 	sf::Time maxTime_; // or maxFrame idk; in any case, it is taken from simulation in the constructor for everything except the Visualization base class
 };
 
-} // namespace Vis
-
-} // namespace MyFem
+} // namespace MyUtils::Vis

@@ -1,0 +1,7 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+find_dependency(SFML CONFIG REQUIRED COMPONENTS Graphics Window System)
+
+include("${CMAKE_CURRENT_LIST_DIR}/myUtilsTargets.cmake")

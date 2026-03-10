@@ -3,9 +3,9 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "mu.hpp"
-
-namespace MyFem::Vis {
+namespace MyUtils::Vis {
+  
+using std::vector;
   
 class VisualizationBase; // forward decl
 
@@ -25,7 +25,7 @@ class Object {
   bool attached_ = false; // == "activated"
  protected:
   void attach(VisualizationBase* vis);
-  void deattach();
+  void detach();
  public:
   inline bool isAttached() {
     return attached_;
@@ -43,17 +43,17 @@ class Object {
 class Graph : public Object {
  public:
   Graph();
-  Graph(uint posX, uint posY, uint width, uint height, Array<Array<double>> graphDataXY)
+  Graph(uint posX, uint posY, uint width, uint height, vector<vector<double>> graphDataXY)
     : Object(posX, posY), width_(width), height_(height), graphDataXY_(graphDataXY) {};
 
   uint width_;
   uint height_;
   
-  Array<Array<double>> graphDataXY_; // inner array has size 2, so X, Y
+  vector<vector<double>> graphDataXY_; // inner array has size 2, so X, Y
   
  protected:
   virtual void draw() const override;
   
 };
 
-} // namespace MyFem::Vis
+} // namespace MyUtils::Vis

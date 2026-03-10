@@ -1,5 +1,7 @@
-#include "Test1.hpp"
+#include "Test_core.hpp"
+#include "Test_vis.hpp"
 
 int main(int argCount, char** args) {
-  return Test1(argCount, args);
+  Test_core(argCount, args);
+  Test_vis(argCount, args);
 }

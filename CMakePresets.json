@@ -18,7 +18,7 @@
       "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
       "CMAKE_C_COMPILER": "gcc",
       "CMAKE_C_COMPILER_LAUNCHER": "ccache",
-      "_COMMENT_SFML_ROOT": "/home/oesterle/misc/tpl/SFML_base/install"
+      "SFML_ROOT": "/home/oesterle/misc/tpl/SFML_base/install"
     }
     }
   ]

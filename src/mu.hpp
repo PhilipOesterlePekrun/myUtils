@@ -4,3 +4,4 @@
 #include "mu_core.hpp"
 #include "mu_db.hpp"
 #include "mu_nummethods.hpp"
+#include "mu_vis.hpp"
