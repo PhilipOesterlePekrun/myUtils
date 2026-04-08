@@ -79,11 +79,14 @@ class VisualizationBase {
   sf::Time currentTime() const {
     return sf::Time(sf::seconds((float)currentFrame_/framerate_));
   }
-  int currentFrame() const {
+  uint currentFrame() const {
     return currentFrame_;
   }
-  unsigned int getMaxFrame() const {
-    return framerate_*maxTime_.asSeconds();
+  double getMaxTime() const {
+    return (double)maxFrame_/framerate_;
+  }
+  uint getMaxFrame() const {
+    return maxFrame_;
   }
   
 /*static void loadFont(sf::Font *fontObj, std::string filePath) {
@@ -107,12 +110,12 @@ class VisualizationBase {
 	sf::Font* defaultFont_;
 	int defaultFontSize_ = 12; // might delete if it does not make sense
 
-	unsigned int currentFrame_=0; // or use time, idk
+	uint currentFrame_=0; // or use time, idk
 	bool active_=false; // active = window open
 	bool paused_=true;
-	bool playOnLoop_=false;
+	bool playOnLoop_=true;
  protected:
-	sf::Time maxTime_; // or maxFrame idk; in any case, it is taken from simulation in the constructor for everything except the Visualization base class
+	uint maxFrame_; // or maxFrame idk; in any case, it is taken from simulation in the constructor for everything except the Visualization base class
 };
 
 } // namespace MyUtils::Vis

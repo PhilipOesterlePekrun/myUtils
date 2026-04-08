@@ -2,6 +2,29 @@
 
 include(CMakeFindDependencyMacro)
 
+set(_myutils_baked_sfml_root "@MYUTILS_BAKED_SFML_ROOT@")
+
+# Respect an explicit downstream override first.
+# Otherwise, use the baked-in default.
+if(NOT DEFINED SFML_ROOT AND NOT DEFINED SFML_DIR)
+  if(_myutils_baked_sfml_root)
+    if(EXISTS "${_myutils_baked_sfml_root}")
+      set(SFML_ROOT "${_myutils_baked_sfml_root}")
+    else()
+      message(FATAL_ERROR
+        "myUtils was built expecting SFML under:\n"
+        "  ${_myutils_baked_sfml_root}\n"
+        "That path does not exist on this machine.\n"
+        "Override it with either:\n"
+        "  -DSFML_ROOT=/absolute/path/to/sfml/prefix\n"
+        "or:\n"
+        "  -DSFML_DIR=/absolute/path/to/directory/containing/SFMLConfig.cmake"
+      )
+    endif()
+  endif()
+endif()
+
 find_dependency(SFML CONFIG REQUIRED COMPONENTS Graphics Window System)
 
 include("${CMAKE_CURRENT_LIST_DIR}/myUtilsTargets.cmake")
+check_required_components(myUtils)

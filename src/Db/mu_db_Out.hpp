@@ -28,24 +28,40 @@ class LoadingBar {
   const int centerLength_;
   const int initialIndent_;
   
-  int i = 0;
-  int progress = 0;
+  int i_ = 0;
+  int progress_ = 0;
   
  public:
   LoadingBar(int size, int centerLength, int initialIndent = 0)
   : size_(size), centerLength_(centerLength), initialIndent_(initialIndent) {}
   
   void operator()() {
-    if(i==0) std::cout<<Strings::repeatStr(" ", initialIndent_)<<"[";
-    if(i==size_-1) std::cout<<"]\n";
-    else
-      if((double)i/size_>(double)progress/centerLength_) {
-        if(progress!=0 && progress%(centerLength_/10)==0) std::cout<<"|"<<std::flush;
-        else std::cout<<"="<<std::flush;
-        ++progress;
+    if (size_ <= 0 || centerLength_ <= 0) return;
+
+    if (i_ == 0) {
+      std::cout << std::string(initialIndent_, ' ') << "[";
+    }
+
+    int targetProgress = ((i_ + 1) * centerLength_) / size_;
+
+    while (progress_ < targetProgress) {
+      if (centerLength_ >= 10 &&
+          progress_ != 0 &&
+          progress_ % (centerLength_ / 10) == 0) {
+        std::cout << "|";
+      } else {
+        std::cout << "=";
       }
-      
-    ++i;
+      ++progress_;
+    }
+
+    ++i_;
+
+    if (i_ == size_) {
+      std::cout << "]\n";
+    }
+
+    std::cout.flush();
   }
 };
 

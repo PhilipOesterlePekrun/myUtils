@@ -58,7 +58,17 @@ if(EXISTS "${SRC_ROOT}/Vis") # i.e. not marked as _EXCLUDE
     SFML::Window
     SFML::System
   )
+  
+  # Bake in the default location you want downstream projects to use.
+  # Prefer the prefix you already pass in.
+  set(MYUTILS_BAKED_SFML_ROOT "${SFML_ROOT}")
 endif()
+
+configure_package_config_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/myUtilsConfig.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/myUtilsConfig.cmake"
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/myUtils
+)
 
 
 # Install the library
@@ -85,6 +95,7 @@ install(FILES
   "${CMAKE_CURRENT_BINARY_DIR}/myUtilsConfigVersion.cmake"
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/myUtils
 )
+install(FILES ${SRC_HPP} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 
 # Create test executable

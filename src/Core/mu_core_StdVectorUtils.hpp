@@ -48,6 +48,7 @@ vector<size_t> find(const vector<T>& v, T val) {
   return arr;
 }
 
+// It is safe for [indicesToDelete] to have dupicates; they will be ignored
 template<typename T>
 void deleteIndices(vector<T>& v, const vector<size_t>& indicesToDelete) {
   vector<char> del(v.size(), false);

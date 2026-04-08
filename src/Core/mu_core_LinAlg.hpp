@@ -31,8 +31,27 @@ class Vectord {
   // For literal
   Vectord(const vector<double>& raw)
     : size_(raw.size()), data_(raw) {}
+  // Set the elements all to a starting value
+  Vectord(size_t size, double val)
+    : size_(size), data_(size, val) {}
     
   const vector<double>& raw() const {return data_;}
+  
+  Vectord& operator=(const Vectord& other) {
+    if (this == &other) return *this;
+    size_ = other.size_;
+    data_ = other.data_;
+    return *this;
+  }
+
+  Vectord& operator=(Vectord&& other) noexcept {
+    if (this == &other) return *this;
+    size_ = other.size_;
+    data_ = std::move(other.data_);
+    other.size_ = 0;
+    other.data_.clear();
+    return *this;
+  }
 
   // Access by (i, j)
   double& operator()(size_t i) {
@@ -114,8 +133,8 @@ class Vectord {
     return maxVal;
   }
   
-  inline void print(int eleStrLen = 5) const { //# we make inline for now
-    std::cout<<"[";
+  std::string toString(int eleStrLen = 5) const {
+    std::string str = "[";
     for(int i=0; i<size_; ++i) {
       std::string tmpStr = std::to_string((*this)(i));
       std::string tmpStr2;
@@ -125,11 +144,16 @@ class Vectord {
         else
           tmpStr2 +=tmpStr[s];
       }
-      std::cout<<tmpStr2;
+      str+=tmpStr2;
       if(i<size_-1)
-        std::cout<<" ";
+        str+=" ";
     }
-    std::cout<<"]^T\n";
+    str+="]^T\n";
+    
+    return str;
+  }
+  inline void print(int eleStrLen = 5) const { //# we make inline for now
+    std::cout<<toString(eleStrLen);
   }
 };
   
@@ -154,6 +178,24 @@ class Matrix2d {
     : nRows_(rows), nCols_(cols), data_(flatVect) {}
     
   const Vectord& raw() const {return data_;}
+  
+  Matrix2d& operator=(const Matrix2d& other) {
+    if (this == &other) return *this;
+    nRows_ = other.nRows_;
+    nCols_ = other.nCols_;
+    data_ = other.data_;
+    return *this;
+  }
+
+  Matrix2d& operator=(Matrix2d&& other) noexcept {
+    if (this == &other) return *this;
+    nRows_ = other.nRows_;
+    nCols_ = other.nCols_;
+    data_ = std::move(other.data_);
+    other.nRows_ = 0;
+    other.nCols_ = 0;
+    return *this;
+  }
 
   // Access by (i, j)
   double& operator()(size_t i, size_t j) {
@@ -369,6 +411,27 @@ class Matrix3d {
     : nI_(I), nJ_(J), nK_(K), data_(flatVect) {}
     
   const Vectord& raw() const {return data_;}
+  
+  Matrix3d& operator=(const Matrix3d& other) {
+    if (this == &other) return *this;
+    nI_ = other.nI_;
+    nJ_ = other.nJ_;
+    nK_ = other.nK_;
+    data_ = other.data_;
+    return *this;
+  }
+
+  Matrix3d& operator=(Matrix3d&& other) noexcept {
+    if (this == &other) return *this;
+    nI_ = other.nI_;
+    nJ_ = other.nJ_;
+    nK_ = other.nK_;
+    data_ = std::move(other.data_);
+    other.nI_ = 0;
+    other.nJ_ = 0;
+    other.nK_ = 0;
+    return *this;
+  }
 
   // Access by (i, j)
   double& operator()(size_t i, size_t j, size_t k) {
@@ -538,6 +601,30 @@ class Matrix4d {
     : nI_(I), nJ_(J), nK_(K), nL_(L), data_(flatVect) {}
     
   const Vectord& raw() const {return data_;}
+  
+  Matrix4d& operator=(const Matrix4d& other) {
+    if (this == &other) return *this;
+    nI_ = other.nI_;
+    nJ_ = other.nJ_;
+    nK_ = other.nK_;
+    nL_ = other.nL_;
+    data_ = other.data_;
+    return *this;
+  }
+
+  Matrix4d& operator=(Matrix4d&& other) noexcept {
+    if (this == &other) return *this;
+    nI_ = other.nI_;
+    nJ_ = other.nJ_;
+    nK_ = other.nK_;
+    nL_ = other.nL_;
+    data_ = std::move(other.data_);
+    other.nI_ = 0;
+    other.nJ_ = 0;
+    other.nK_ = 0;
+    other.nL_ = 0;
+    return *this;
+  }
 
   // Access by (i, j)
   double& operator()(size_t i, size_t j, size_t k, size_t l) {
@@ -724,6 +811,10 @@ inline Matrix2d mat2dPlusMat2d(const Matrix2d& mat1, const Matrix2d& mat2) {
   return r;
 }
 inline double vectdDotVectd(const Vectord& v1, const Vectord& v2) {
+  #ifdef myUtils_DbPr_ON
+  if(v1.size()!=v2.size()) MU_THROW("v1.size()!=v2.size()");
+  #endif
+  
   double r = 0.0;
   for(int i=0; i<v1.size(); ++i)
     r += v1(i)*v2(i);
