@@ -69,6 +69,12 @@ std::string readFileFromStr(const std::string& filePath) {
   
   return str;
 }
+std::string readFileToStr(const std::string& filePath) {
+  std::ifstream fIn(filePath, std::ios::binary);
+  std::string str((std::istreambuf_iterator<char>(fIn)), {});
+  
+  return str;
+}
 void writeFileFromStr(const std::string& filePath, const std::string& str, bool chmodX) {
   std::ofstream fOut(filePath);
   fOut << str;
@@ -94,6 +100,9 @@ void readFileLines(const std::string& filePath, std::vector<std::string>& strVec
     }
   }
 }
+std::vector<std::string> readFileLines(const std::string& filePath) {
+  return Strings::strToStrArray(readFileToStr(filePath));
+}
 
 void writeFile(const std::string& filePath, const std::string& lines) {
   std::ofstream outFile(filePath);
@@ -111,6 +120,9 @@ void writeFileLines(const std::string& filePath, const std::vector<std::string>&
 
   FOR(i, lines.size())
     outFile << lines[i]<<"\n";
+}
+void writeFileLines(const std::string& filePath, const std::vector<std::string>& lines, bool chmodX) {
+  writeFileFromStr(filePath, Strings::strArrayToStr(lines), chmodX);
 }
 
 void writeFileLinesBinary(const std::string& filePath, std::string* lines, int lineCount) {
@@ -165,16 +177,6 @@ void replaceKeywordsAndWriteFile(std::string& filePathInAbs, std::string& folder
   std::filesystem::path filePathOutPath(filePathOutFull);
   std::filesystem::create_directory(filePathOutPath.parent_path());
   MyUtils::IO::writeFileLinesBinary(filePathOutFull, &stringArr);
-}
-
-// With MyArray
-  
-std::vector<std::string> readFileLines(const std::string& filePath) {
-  return Strings::strToStrArray(readFileFromStr(filePath));
-}
-
-void writeFileLines(const std::string& filePath, std::vector<std::string> lines, bool chmodX) {
-  writeFileFromStr(filePath, Strings::strArrayToStr(lines), chmodX);
 }
 
 } // namespace MyUtils::IO

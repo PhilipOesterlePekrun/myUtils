@@ -28,6 +28,11 @@ class Vectord {
   // This constructor just duplicates other
   Vectord(const Vectord& other)
     : size_(other.size()), data_(other.raw()) {}
+  // Move ctor
+  Vectord(Vectord&& other) noexcept
+    : size_(other.size_), data_(std::move(other.data_)) {
+    other.size_ = 0;
+  }
   // For literal
   Vectord(const vector<double>& raw)
     : size_(raw.size()), data_(raw) {}
@@ -148,7 +153,7 @@ class Vectord {
       if(i<size_-1)
         str+=" ";
     }
-    str+="]^T\n";
+    str+="]^T";
     
     return str;
   }
