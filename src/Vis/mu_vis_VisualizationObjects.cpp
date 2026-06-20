@@ -4,6 +4,9 @@
 
 #include <SFML/Graphics.hpp>
 
+#include <algorithm>
+#include <cmath>
+
 namespace MyUtils::Vis {
   
 void Object::attach(VisualizationBase* vis) {
@@ -17,33 +20,109 @@ void Object::detach() {
 }
   
 void Graph::draw() const {
-  visWindow_->draw(vis_->textConstructorXY("X-axis", posX_+(float)width_/2, posY_-10));
-  sf::RectangleShape xAxis(sf::Vector2f(width_, 5));
-  xAxis.setPosition(vis_->Vector2fInXY(posX_, posY_));
+  const float posX = static_cast<float>(posX_);
+  const float posY = static_cast<float>(posY_);
+  const float width = static_cast<float>(width_);
+  const float height = static_cast<float>(height_);
+  constexpr float axisThickness = 5.0f;
+  constexpr float plotInset = 2.0f;
+
+  visWindow_->draw(vis_->textConstructorXY("X-axis", posX + width / 2.0f, posY - 10.0f));
+  sf::RectangleShape xAxis(sf::Vector2f(width, axisThickness));
+  xAxis.setPosition(vis_->Vector2fInXY(posX, posY));
   xAxis.setFillColor(sf::Color(0, 0, 0));
   visWindow_->draw(xAxis);
   
-  visWindow_->draw(vis_->textConstructorXY("Y-axis", posX_-50, posY_+(float)height_/2));
-  sf::RectangleShape yAxis(sf::Vector2f(5, height_));
-  yAxis.setPosition(vis_->Vector2fInXY(posX_, posY_+height_));
+  visWindow_->draw(vis_->textConstructorXY("Y-axis", posX - 50.0f, posY + height / 2.0f));
+  sf::RectangleShape yAxis(sf::Vector2f(axisThickness, height));
+  yAxis.setPosition(vis_->Vector2fInXY(posX, posY + height));
   yAxis.setFillColor(sf::Color(0, 0, 0));
   visWindow_->draw(yAxis);
-  
-  int n = graphDataXY_.size()-1;
-  
-  visWindow_->draw(vis_->textConstructorXY(std::to_string(graphDataXY_[0][0]), posX_, posY_-10)); // x bottom
-  visWindow_->draw(vis_->textConstructorXY(std::to_string(graphDataXY_[n][0]), posX_+width_, posY_-10)); // x top
-  
-  visWindow_->draw(vis_->textConstructorXY(std::to_string(graphDataXY_[0][1]), posX_-50, posY_)); // y bottom
-  visWindow_->draw(vis_->textConstructorXY(std::to_string(graphDataXY_[n][1]), posX_-50, posY_+height_)); // y top
-  
-  sf::VertexArray lines(sf::PrimitiveType::LineStrip, graphDataXY_.size());
-  FOR(i, graphDataXY_.size()) {
-    lines[i].position = vis_->Vector2fInXY(
-      posX_+2+(double)width_*((graphDataXY_[i][0]-graphDataXY_[0][0])/(graphDataXY_[n][0]-graphDataXY_[0][0])),
-      posY_+2+(double)height_*((graphDataXY_[i][1]-graphDataXY_[0][1])/(graphDataXY_[n][1]-graphDataXY_[0][1]))
+
+  bool hasValidPoint = false;
+  std::size_t validPointCount = 0;
+  double minX = 0.0;
+  double maxX = 0.0;
+  double minY = 0.0;
+  double maxY = 0.0;
+
+  for (const auto& point : graphDataXY_) {
+    if (point.size() < 2 || !std::isfinite(point[0]) || !std::isfinite(point[1])) {
+      continue;
+    }
+
+    const double x = point[0];
+    const double y = point[1];
+    if (!hasValidPoint) {
+      minX = maxX = x;
+      minY = maxY = y;
+      hasValidPoint = true;
+    } else {
+      minX = std::min(minX, x);
+      maxX = std::max(maxX, x);
+      minY = std::min(minY, y);
+      maxY = std::max(maxY, y);
+    }
+    ++validPointCount;
+  }
+
+  if (!hasValidPoint) {
+    return;
+  }
+
+  auto expandDegenerateRange = [](double& minValue, double& maxValue) {
+    if (minValue == maxValue) {
+      const double padding = std::max(std::abs(minValue) * 0.05, 1.0);
+      minValue -= padding;
+      maxValue += padding;
+    }
+  };
+
+  expandDegenerateRange(minX, maxX);
+  expandDegenerateRange(minY, maxY);
+
+  visWindow_->draw(vis_->textConstructorXY(std::to_string(minX), posX, posY - 10.0f));
+  visWindow_->draw(vis_->textConstructorXY(std::to_string(maxX), posX + width, posY - 10.0f));
+  visWindow_->draw(vis_->textConstructorXY(std::to_string(minY), posX - 50.0f, posY));
+  visWindow_->draw(vis_->textConstructorXY(std::to_string(maxY), posX - 50.0f, posY + height));
+
+  const float plotWidth = std::max(width - 2.0f * plotInset, 0.0f);
+  const float plotHeight = std::max(height - 2.0f * plotInset, 0.0f);
+
+  auto graphPointToWindowPoint = [&](double x, double y) {
+    const double xRatio = (x - minX) / (maxX - minX);
+    const double yRatio = (y - minY) / (maxY - minY);
+    return vis_->Vector2fInXY(
+      posX + plotInset + plotWidth * static_cast<float>(xRatio),
+      posY + plotInset + plotHeight * static_cast<float>(yRatio)
     );
-    lines[i].color = vis_->secondaryColor_;
+  };
+
+  if (validPointCount == 1) {
+    for (const auto& point : graphDataXY_) {
+      if (point.size() < 2 || !std::isfinite(point[0]) || !std::isfinite(point[1])) {
+        continue;
+      }
+
+      sf::CircleShape pointShape(3.0f);
+      pointShape.setOrigin(sf::Vector2f(3.0f, 3.0f));
+      pointShape.setPosition(graphPointToWindowPoint(point[0], point[1]));
+      pointShape.setFillColor(vis_->secondaryColor_);
+      visWindow_->draw(pointShape);
+      return;
+    }
+  }
+
+  sf::VertexArray lines(sf::PrimitiveType::LineStrip, validPointCount);
+  std::size_t lineIndex = 0;
+  for (const auto& point : graphDataXY_) {
+    if (point.size() < 2 || !std::isfinite(point[0]) || !std::isfinite(point[1])) {
+      continue;
+    }
+
+    lines[lineIndex].position = graphPointToWindowPoint(point[0], point[1]);
+    lines[lineIndex].color = vis_->secondaryColor_;
+    ++lineIndex;
   }
   visWindow_->draw(lines);
 }
